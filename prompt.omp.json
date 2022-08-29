@@ -40,6 +40,9 @@
           "powerline_symbol": "\ue0b0",
           "foreground": "#193549",
           "background": "#95ffa4",
+          "properties": {
+            "branch_icon": "\ue725"
+          },
           "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
         },
         {
