@@ -4,3 +4,11 @@ set completion-ignore-case on
 set show-all-if-ambiguous on
 set bell-style none
 set colored-stats on
+
+# ctrl+shift+left, ctrl+shift+right
+"\e[1;6D": backward-kill-word
+"\e[1;6C": kill-word
+
+# shift+left, shift+right
+"\e[1;2D": backward-delete-char
+"\e[1;2C": delete-char
