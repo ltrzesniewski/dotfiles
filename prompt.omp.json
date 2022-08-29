@@ -10,45 +10,45 @@
       "newline": true,
       "segments": [
         {
-          "type": "root",
-          "foreground": "#FFEE58",
+          "type": "os",
           "style": "plain",
-          "template": " \uf0e7 "
+          "foreground": "#FFEE58",
+          "template": "{{ if .Root }}\uf0e7 {{end}}{{.Icon}}"
         },
         {
           "type": "session",
-          "background": "#F3AE35",
-          "foreground": "#262B44",
-          "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": "{{if ne .OS \"windows\"}} {{ .UserName }}@{{ .HostName }} {{end}}"
+          "powerline_symbol": "\ue0b0",
+          "foreground": "#262B44",
+          "background": "#F3AE35",
+          "template": " \uf503 {{ if .SSHSession }}\uf817 {{ end }}{{ .UserName }}@{{ .HostName }} "
         },
         {
           "type": "path",
-          "background": "#91ddff",
-          "foreground": "#100e23",
+          "style": "powerline",
           "powerline_symbol": "\ue0b0",
+          "foreground": "#100e23",
+          "background": "#91ddff",
           "properties": {
             "style": "full"
           },
-          "style": "powerline",
-          "template": " \uf115  {{ path .Path .Location }} "
+          "template": " \uf07c {{ path .Path .Location }} "
         },
         {
           "type": "git",
-          "background": "#95ffa4",
-          "foreground": "#193549",
-          "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": " {{ .HEAD }} "
+          "powerline_symbol": "\ue0b0",
+          "foreground": "#193549",
+          "background": "#95ffa4",
+          "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
         },
         {
           "type": "exit",
-          "background": "#ff8080",
-          "foreground": "#ffffff",
-          "powerline_symbol": "\ue0b0",
           "style": "powerline",
-          "template": " \ue20f "
+          "powerline_symbol": "\ue0b0",
+          "foreground": "#ffffff",
+          "background": "#ff8080",
+          "template": " \ue20f {{ .Code }} "
         }
       ]
     },
@@ -58,13 +58,13 @@
         {
           "type": "executiontime",
           "style": "plain",
-          "background": "transparent",
           "foreground": "#fefefe",
-          "template": " <#F3AE35>\ufbab</> {{ .FormattedMs }}",
+          "background": "transparent",
           "properties": {
             "threshold": 500,
             "style": "austin"
-          }
+          },
+          "template": " <#F3AE35>\ufbab</> {{ .FormattedMs }}"
         }
       ]
     }
