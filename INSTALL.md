@@ -18,8 +18,12 @@ Execute as admin:
 oh-my-posh font install
 
 Install-Module -Name Terminal-Icons -Repository PSGallery
+```
 
-mklink $PROFILE $HOME/dotfiles/Microsoft.PowerShell_profile.ps1
+Add to `$PROFILE`:
+
+```pwsh
+. $HOME/dotfiles/Microsoft.PowerShell_profile.ps1
 ```
 
 # WSL
