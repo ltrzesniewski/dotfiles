@@ -1,40 +1,45 @@
-# Common
+# Config
 
-Clone in `$HOME/dotfiles`
+These are my config files.
 
-# Windows
+This repo is public just for ease of access. Use at your own risk!
+
+# Install
+
+## Common
+
+ - Clone this repo to `~/dotfiles`
+ - Install a [nerd font](https://www.nerdfonts.com/font-downloads) (I use Caskaydia Cove for the terminal)
+
+## Windows
 
 Execute:
 
 ```pwsh
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
-
 winget install JanDeDobbeleer.OhMyPosh -s winget
 ```
 
 Execute as admin:
 
 ```pwsh
-oh-my-posh font install
-
 Install-Module -Name Terminal-Icons -Repository PSGallery
 ```
 
-Add to `$PROFILE`:
+Add to `$PROFILE` (`~/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`):
 
 ```pwsh
-. $HOME/dotfiles/Microsoft.PowerShell_profile.ps1
+. ~/dotfiles/Microsoft.PowerShell_profile.ps1
 ```
 
-# WSL
+## WSL
 
 To share the `dotfiles` repo with Windows:
 
 ```bash
-ln -s /mnt/c/Users/Lucas/dotfiles dotfiles
+ln -s /mnt/c/Users/[username]/dotfiles dotfiles
 ```
 
-# Linux
+## Linux
 
 Execute in `~`:
 
@@ -45,7 +50,7 @@ sudo chmod +x /usr/local/bin/oh-my-posh
 ln -s dotfiles/.inputrc ~/.inputrc
 ```
 
-Add to `.bashrc`:
+Add to `.bashrc` or `.profile`:
 
 ```bash
 source ~/dotfiles/.bashrc

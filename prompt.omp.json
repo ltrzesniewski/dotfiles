@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "version": 2,
-  "console_title_template": "{{if .Root}}\u26a1 {{end}}{{ .Folder }}",
+  "console_title_template": "{{ if .Root }}\u26a1 {{ end }}{{ .Folder }}{{ if .Segments.Session.SSHSession }}@{{ .HostName }}{{ end }}",
   "final_space": true,
   "blocks": [
     {
@@ -13,7 +13,7 @@
           "type": "os",
           "style": "plain",
           "foreground": "#FFEE58",
-          "template": "{{ if .Root }}\uf0e7 {{end}}{{.Icon}}"
+          "template": "{{ if .Root }}\uf0e7 {{ end }}{{ .Icon }}"
         },
         {
           "type": "session",
@@ -21,7 +21,7 @@
           "powerline_symbol": "\ue0b0",
           "foreground": "#262B44",
           "background": "#F3AE35",
-          "template": " \uf503 {{ if .SSHSession }}\uf817 {{ end }}{{ .UserName }}@{{ .HostName }} "
+          "template": " {{ if .SSHSession }}\uf817{{ else }}\uf503{{ end }} {{ .UserName }}@{{ .HostName }} "
         },
         {
           "type": "path",
@@ -32,7 +32,7 @@
           "properties": {
             "style": "full"
           },
-          "template": " \uf07c {{ path .Path .Location }} "
+          "template": " \uf07c {{ if .Segments.Session.SSHSession }}{{ .Path }}{{ else }}{{ path .Path .Location }}{{ end}} "
         },
         {
           "type": "git",
