@@ -9,7 +9,11 @@ This repo is public just for ease of access. Use at your own risk!
 ## Common
 
  - Clone this repo to `~/dotfiles`
- - Install a [nerd font](https://www.nerdfonts.com/font-downloads) (I use Caskaydia Cove for the terminal)
+ - Install a [nerd font](https://www.nerdfonts.com/font-downloads) (use the Mono Windows Compatible variant)
+   - [Hack](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip)
+   - [DejaVu Sans Mono](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/DejaVuSansMono.zip)
+ - Other fonts:
+   - [Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/latest)
 
 ## Windows
 

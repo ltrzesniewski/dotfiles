@@ -8,3 +8,10 @@ if ($env:WT_SESSION)
 
     Import-Module -Name Terminal-Icons -ErrorAction Ignore
 }
+
+if (Get-Command kubectl -ErrorAction Ignore)
+{
+    kubectl completion powershell | Out-String | Invoke-Expression
+}
+
+. "$PSScriptRoot/PowerShell/_rg.ps1"
