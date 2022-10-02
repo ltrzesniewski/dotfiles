@@ -3,6 +3,7 @@
   "version": 2,
   "console_title_template": "{{ if .Root }}\u26a1 {{ end }}{{ .Folder }}{{ if .Segments.Session.SSHSession }}@{{ .HostName }}{{ end }}",
   "final_space": true,
+  "pwd": "osc99",
   "blocks": [
     {
       "type": "prompt",

@@ -15,3 +15,4 @@ if (Get-Command kubectl -ErrorAction Ignore)
 }
 
 . "$PSScriptRoot/PowerShell/_rg.ps1"
+$env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/.ripgreprc"

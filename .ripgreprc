@@ -1,0 +1,7 @@
+--crlf
+--smart-case
+
+--colors=path:fg:cyan
+
+--type-add
+net:include:cs,msbuild

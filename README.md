@@ -2,7 +2,7 @@
 
 These are my config files.
 
-This repo is public just for ease of access. Use at your own risk!
+This repo is public just for ease of access.
 
 # Install
 
@@ -12,7 +12,8 @@ This repo is public just for ease of access. Use at your own risk!
  - Install a [nerd font](https://www.nerdfonts.com/font-downloads) (use the Mono Windows Compatible variant)
    - [Hack](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip)
    - [DejaVu Sans Mono](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/DejaVuSansMono.zip)
- - Other fonts:
+ - IDE fonts:
+   - [Berkeley Mono](https://berkeleygraphics.com/typefaces/berkeley-mono)
    - [Source Code Pro](https://github.com/adobe-fonts/source-code-pro/releases/latest)
 
 ## Windows
