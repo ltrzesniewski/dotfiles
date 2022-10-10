@@ -41,7 +41,7 @@ Add to `$PROFILE` (`~/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.p
 To share the `dotfiles` repo with Windows:
 
 ```bash
-ln -s /mnt/c/Users/[username]/dotfiles dotfiles
+ln -s /mnt/c/Users/$(wslvar USERNAME)/dotfiles dotfiles
 ```
 
 ## Linux
