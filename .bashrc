@@ -7,3 +7,4 @@ command -v oh-my-posh &> /dev/null && eval "$(oh-my-posh init bash --config ~/do
 command -v kubectl &> /dev/null && source <(kubectl completion bash)
 
 export RIPGREP_CONFIG_PATH=~/dotfiles/.ripgreprc
+export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
