@@ -39,6 +39,7 @@ Register-ArgumentCompleter -Native -CommandName 'rg' -ScriptBlock {
             [CompletionResult]::new('--file', 'file', [CompletionResultType]::ParameterName, 'Search for patterns from the given file.')
             [CompletionResult]::new('-g', 'g', [CompletionResultType]::ParameterName, 'Include or exclude files.')
             [CompletionResult]::new('--glob', 'glob', [CompletionResultType]::ParameterName, 'Include or exclude files.')
+            [CompletionResult]::new('--hyperlink-format', 'hyperlink-format', [CompletionResultType]::ParameterName, 'Set the format of hyperlinks to match results.')
             [CompletionResult]::new('--iglob', 'iglob', [CompletionResultType]::ParameterName, 'Include or exclude files case insensitively.')
             [CompletionResult]::new('--ignore-file', 'ignore-file', [CompletionResultType]::ParameterName, 'Specify additional ignore files.')
             [CompletionResult]::new('-M', 'M', [CompletionResultType]::ParameterName, 'Don''t print lines longer than this limit.')
