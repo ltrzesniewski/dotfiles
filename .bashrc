@@ -6,6 +6,11 @@ test -f ~/.cargo/env && source ~/.cargo/env
 command -v oh-my-posh &> /dev/null && eval "$(oh-my-posh init bash --config ~/dotfiles/prompt.omp.json)"
 command -v kubectl &> /dev/null && source <(kubectl completion bash)
 
-export RIPGREP_CONFIG_PATH=~/dotfiles/.ripgreprc
+if [ -n "$WSL_DISTRO_NAME" ]; then
+    export RIPGREP_CONFIG_PATH=~/dotfiles/.ripgreprc-wsl
+else
+    export RIPGREP_CONFIG_PATH=~/dotfiles/.ripgreprc
+fi
+
 export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
