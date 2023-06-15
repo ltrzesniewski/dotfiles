@@ -2,7 +2,9 @@
 --smart-case
 
 --colors=path:fg:cyan
---hyperlink-format=vscode
+
+#--hyperlink-format=vscode
+--hyperlink-format=vscode-custom://file/{file}:{line}:{column}
 
 --type-add
 net:include:cs,msbuild
