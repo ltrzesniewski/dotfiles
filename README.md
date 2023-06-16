@@ -34,17 +34,8 @@ ln -s /mnt/c/Users/$(wslvar USERNAME)/dotfiles dotfiles
 
 ## Linux
 
-Execute in `~`:
+Execute:
 
 ```bash
-sudo wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh
-sudo chmod +x /usr/local/bin/oh-my-posh
-
-ln -s dotfiles/.inputrc ~/.inputrc
-```
-
-Add to `.bashrc` or `.profile`:
-
-```bash
-source ~/dotfiles/.bashrc
+./install.sh
 ```
