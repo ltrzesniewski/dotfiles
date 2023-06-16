@@ -18,22 +18,10 @@ This repo is public just for ease of access.
 
 ## Windows
 
-Execute:
-
-```pwsh
-winget install JanDeDobbeleer.OhMyPosh -s winget
-```
-
 Execute as admin:
 
 ```pwsh
-Install-Module -Name Terminal-Icons -Repository PSGallery
-```
-
-Add to `$PROFILE` (`~/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`):
-
-```pwsh
-. ~/dotfiles/Microsoft.PowerShell_profile.ps1
+./Install.ps1
 ```
 
 ## WSL
