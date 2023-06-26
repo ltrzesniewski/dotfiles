@@ -1,4 +1,3 @@
-#Requires -RunAsAdministrator
 
 # Add profile script
 
@@ -23,10 +22,6 @@ if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
     cargo install bat bottom fd-find
 }
-
-# Install modules
-
-Install-Module -Name Terminal-Icons -Repository PSGallery
 
 # Get rid of the VSCode confirmation dialog
 New-Item -Path "HKCU:\Software\Classes\vscode-custom\shell\open\command" -Force | Out-Null

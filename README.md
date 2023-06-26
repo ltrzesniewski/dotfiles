@@ -18,7 +18,7 @@ This repo is public just for ease of access.
 
 ## Windows
 
-Execute as admin:
+Run to install or update:
 
 ```pwsh
 ./Install.ps1
@@ -34,7 +34,7 @@ ln -s /mnt/c/Users/$(wslvar USERNAME)/dotfiles dotfiles
 
 ## Linux
 
-Execute:
+Run to install or update:
 
 ```bash
 ./install.sh
