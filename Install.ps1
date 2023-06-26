@@ -14,6 +14,16 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 winget install --source winget --silent JanDeDobbeleer.OhMyPosh
 
+# Install Rust apps
+
+if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
+    rustup update stable
+}
+
+if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
+    cargo install bat bottom fd-find
+}
+
 # Install modules
 
 Install-Module -Name Terminal-Icons -Repository PSGallery

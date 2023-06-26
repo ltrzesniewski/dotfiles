@@ -14,3 +14,6 @@ fi
 
 export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
+
+source ~/dotfiles/bash/.bash-preexec.sh
+command -v atuin &> /dev/null && source <(atuin init bash --disable-up-arrow)
