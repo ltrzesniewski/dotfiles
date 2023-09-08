@@ -13,6 +13,12 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 winget install --source winget --silent JanDeDobbeleer.OhMyPosh
 
+# Install dotnet tools
+
+if (Get-Command "dotnet" -ErrorAction SilentlyContinue) {
+    dotnet tool update -g csharprepl
+}
+
 # Install Rust apps
 
 if (Get-Command "rustup" -ErrorAction SilentlyContinue) {

@@ -15,6 +15,10 @@ mkdir -p ~/bin
 wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O ~/bin/oh-my-posh
 chmod +x ~/bin/oh-my-posh
 
+# Install dotnet tools
+
+command -v dotnet &> /dev/null && dotnet tool update -g csharprepl
+
 # Install Rust apps
 
 command -v rustup &> /dev/null && rustup update stable
