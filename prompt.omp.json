@@ -47,12 +47,12 @@
           "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
         },
         {
-          "type": "exit",
+          "type": "status",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
           "foreground": "#ffffff",
           "background": "#ff8080",
-          "template": " \ue20f {{ .Code }} "
+          "template": " \ue20f {{ .String }} "
         }
       ]
     },
