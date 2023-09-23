@@ -21,4 +21,3 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
- 

@@ -11,7 +11,7 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 # Install apps
 
-winget install --source winget --silent JanDeDobbeleer.OhMyPosh
+winget install --source winget --silent JanDeDobbeleer.OhMyPosh Microsoft.Powershell
 
 # Install dotnet tools
 
