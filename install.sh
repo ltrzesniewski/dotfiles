@@ -22,8 +22,14 @@ command -v dotnet &> /dev/null && dotnet tool update -g csharprepl
 # Install Rust apps
 
 command -v rustup &> /dev/null && rustup update stable
-command -v cargo &> /dev/null && cargo install atuin bat bottom fd-find
-command -v cargo &> /dev/null && cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
+
+if command -v cargo &> /dev/null; then
+    cargo install atuin
+    cargo install bat
+    cargo install bottom
+    cargo install fd-find
+    cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
+fi
 
 echo
 echo Done
