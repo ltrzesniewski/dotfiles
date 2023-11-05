@@ -23,6 +23,7 @@ command -v dotnet &> /dev/null && dotnet tool update -g csharprepl
 
 command -v rustup &> /dev/null && rustup update stable
 command -v cargo &> /dev/null && cargo install atuin bat bottom fd-find
+command -v cargo &> /dev/null && cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
 
 echo
 echo Done

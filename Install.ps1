@@ -28,6 +28,7 @@ if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
     cargo install bat bottom fd-find
+    cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
 }
 
 Write-Output ""
