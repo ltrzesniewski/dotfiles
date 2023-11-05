@@ -3,8 +3,7 @@
 
 --colors=path:fg:cyan
 
-#--hyperlink-format=vscode://file//{host}/{file}:{line}:{column}
---hyperlink-format=vscode-custom://file///{host}/{file}:{line}:{column}
+--hyperlink-format=vscode://file//{host}/{file}:{line}:{column}
 
 --type-add
 net:include:cs,msbuild
