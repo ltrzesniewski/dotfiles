@@ -28,7 +28,7 @@ if command -v cargo &> /dev/null; then
     cargo install bat
     cargo install bottom
     cargo install fd-find
-    cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
+    cargo install ripgrep --features pcre2
 fi
 
 echo

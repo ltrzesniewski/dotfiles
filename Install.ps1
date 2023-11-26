@@ -30,7 +30,7 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
     cargo install bat
     cargo install bottom
     cargo install fd-find
-    cargo install --git https://github.com/BurntSushi/ripgrep.git --features pcre2
+    cargo install ripgrep --features pcre2
 }
 
 Write-Output ""
