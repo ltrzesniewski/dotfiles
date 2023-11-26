@@ -11,8 +11,10 @@ if (Get-Command kubectl -ErrorAction Ignore) {
     kubectl completion powershell | Out-String | Invoke-Expression
 }
 
-. "$PSScriptRoot/PowerShell/_rg.ps1"
-$env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/.ripgreprc"
+if (Get-Command rg -ErrorAction Ignore) {
+    $env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/.ripgreprc"
+    rg --generate complete-powershell | Out-String | Invoke-Expression
+}
 
 # PowerShell parameter completion shim for the dotnet CLI
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
