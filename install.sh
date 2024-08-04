@@ -3,6 +3,13 @@ set -eo pipefail
 
 cd "$(dirname "$0")"
 
+# Install packages
+
+if command -v apt &> /dev/null; then
+    # Required by atuin
+    command -v protoc &> /dev/null || dpkg-query -Wf'${db:Status-abbrev}' protobuf-compiler &> /dev/null || sudo apt update && sudo apt install -y protobuf-compiler
+fi
+
 # Setup scripts
 
 grep -qF '~/dotfiles/.bashrc' ~/.bashrc || echo 'source ~/dotfiles/.bashrc' >> ~/.bashrc
