@@ -1,4 +1,20 @@
 
+Function Install-App {
+    param (
+        [string]$AppName,
+        [scriptblock]$ScriptBlock,
+        [int[]]$ValidExitCodes = @()
+    )
+
+    Write-Host ""
+    Write-Host -ForegroundColor Yellow "INSTALLING: $AppName"
+    & @ScriptBlock
+    if ($LastExitCode -ne 0 -and $ValidExitCodes -notcontains $LastExitCode) {
+        Write-Host -ForegroundColor Red "    FAILED: $AppName"
+        exit $LastExitCode
+    }
+}
+
 # Add profile script
 
 if (!(Test-Path -Path $PROFILE)) {
@@ -11,27 +27,27 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 # Install apps
 
-winget install --source winget --silent Microsoft.Powershell
-winget install --source winget --silent JanDeDobbeleer.OhMyPosh
+Install-App "PowerShell" { winget install --source winget --silent Microsoft.Powershell } -ValidExitCodes @(0x8A15002B)
+Install-App "OhMyPosh" { winget install --source winget --silent JanDeDobbeleer.OhMyPosh } -ValidExitCodes @(0x8A15002B)
 
 # Install dotnet tools
 
 if (Get-Command "dotnet" -ErrorAction SilentlyContinue) {
-    dotnet tool update -g csharprepl
+    Install-App "C# REPL" { dotnet tool update -g csharprepl }
 }
 
 # Install Rust apps
 
 if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
-    rustup update stable
+    Install-App "rust update" { rustup update stable }
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
-    cargo install bat
-    cargo install bottom
-    cargo install fd-find
-    cargo install ripgrep --features pcre2
+    Install-App "bat" { cargo install bat }
+    Install-App "btm" { cargo install bottom }
+    Install-App "fd" { cargo install fd-find }
+    Install-App "ripgrep" { cargo install ripgrep --features pcre2 }
 }
 
-Write-Output ""
-Write-Output "Done"
+Write-Host ""
+Write-Host -ForegroundColor Yellow "DONE"
