@@ -29,6 +29,7 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 Install-App "PowerShell" { winget install --source winget --silent Microsoft.Powershell } -ValidExitCodes @(0x8A15002B)
 Install-App "OhMyPosh" { winget install --source winget --silent JanDeDobbeleer.OhMyPosh } -ValidExitCodes @(0x8A15002B)
+Install-App "jq" { winget install --source winget --silent jqlang.jq } -ValidExitCodes @(0x8A15002B)
 
 # Install dotnet tools
 
