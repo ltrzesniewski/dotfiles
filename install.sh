@@ -8,14 +8,6 @@ function startInstall() {
     echo -e "\e[0;1;33mINSTALLING: $1\e[0m"
 }
 
-# Install packages
-
-if command -v apt &> /dev/null; then
-    # Required by atuin
-    startInstall protoc
-    command -v protoc &> /dev/null || dpkg-query -Wf'${db:Status-abbrev}' protobuf-compiler &> /dev/null || sudo apt update && sudo apt install -y protobuf-compiler
-fi
-
 # Setup scripts
 
 grep -qF '~/dotfiles/.bashrc' ~/.bashrc || echo 'source ~/dotfiles/.bashrc' >> ~/.bashrc
@@ -58,3 +50,4 @@ fi
 
 echo
 echo -e "\e[0;1;33mDONE\e[0m"
+echo

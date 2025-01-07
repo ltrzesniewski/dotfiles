@@ -44,6 +44,7 @@ if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
+    Install-App "atuin" { cargo install atuin }
     Install-App "bat" { cargo install bat }
     Install-App "btm" { cargo install bottom }
     Install-App "fd" { cargo install fd-find }
@@ -52,3 +53,4 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
 
 Write-Host ""
 Write-Host -ForegroundColor Yellow "DONE"
+Write-Host ""
