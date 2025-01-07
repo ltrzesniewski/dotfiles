@@ -1,0 +1,23 @@
+{
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "language": "en-US",
+    "launchMode": "maximized",
+    "profiles": {
+        "defaults": {
+            "closeOnExit": "never",
+            "font": {
+                "face": "Berkeley Mono, Hack NF",
+                "features": {
+                    "calt": 0
+                },
+                "size": 9
+            }
+        }
+    },
+    "tabSwitcherMode": "mru",
+    "theme": "dark",
+    "trimBlockSelection": true,
+    "useAcrylicInTabRow": false,
+    "windowingBehavior": "useAnyExisting"
+}
