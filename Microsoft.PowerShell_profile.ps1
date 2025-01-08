@@ -25,7 +25,7 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
 }
 
 # Atuin
-if (Get-Command atuin -ErrorAction Ignore) {
+if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAction Ignore)) {
     $env:ATUIN_SESSION = (atuin uuid | Out-String).Trim()
     $env:ATUIN_HISTORY_ID = $null
 
@@ -53,26 +53,34 @@ if (Get-Command atuin -ErrorAction Ignore) {
         & $existingPromptFunction.ScriptBlock
     }
 
-    # $InvokeAtuinSearch = {
-    #     $keymapMode = "emacs"
+    Set-PSReadLineKeyHandler -Chord "Ctrl+r" -ScriptBlock {
+        $line = $null
+        $cursor = $null
+        [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+        [Microsoft.PowerShell.PSConsoleReadLine]::InsertLineBelow()
 
-    #     $line = $null
-    #     $cursor = $null
-    #     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+        try {
+            $resultFile = New-TemporaryFile
+            Start-Process -Wait -NoNewWindow -RedirectStandardError $resultFile.FullName atuin -ArgumentList "search", "-i", "--keymap-mode=emacs", "--", "$line"
+            $suggestion = (Get-Content -Raw $resultFile).Trim()
+        }
+        finally {
+            Remove-Item $resultFile
+        }
 
-    #     $suggestion = (atuin search --keymap-mode=$keymapMode -i -- $line | Out-String).Trim()
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
 
-    #     [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        $previousOutputEncoding = [Console]::OutputEncoding
+        [Console]::OutputEncoding = [Text.Encoding]::UTF8
+        [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
+        [Console]::OutputEncoding = $previousOutputEncoding
 
-    #     if ($suggestion.StartsWith("__atuin_accept__:")) {
-    #         $suggestion = $suggestion.Substring(16)
-    #         [Microsoft.PowerShell.PSConsoleReadLine]::Insert($suggestion)
-    #         [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-    #     }
-    #     else {
-    #         [Microsoft.PowerShell.PSConsoleReadLine]::Insert($suggestion)
-    #     }
-    # }
-
-    # Set-PSReadLineKeyHandler -Chord "Ctrl+r" -ScriptBlock $InvokeAtuinSearch -BriefDescription "AtuinSearch" -Description "Invoke Atuin search for command history"
+        if ($suggestion.StartsWith("__atuin_accept__:")) {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($suggestion.Substring(17))
+            [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+        }
+        else {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($suggestion)
+        }
+    }
 }
