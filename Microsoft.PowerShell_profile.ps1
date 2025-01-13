@@ -5,6 +5,7 @@ if ($env:WT_SESSION) {
     }
 
     if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAction Ignore)) {
+        $env:ATUIN_POWERSHELL_PROMPT_OFFSET = -1
         atuin init powershell --disable-up-arrow | Out-String | Invoke-Expression
     }
 
