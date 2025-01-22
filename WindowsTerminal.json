@@ -6,7 +6,11 @@
     "profiles": {
         "defaults": {
             "closeOnExit": "never",
+            "colorScheme": "Dark+",
             "font": {
+                "axes": {
+                    "wdth": 90
+                },
                 "face": "Berkeley Mono, Hack NF",
                 "features": {
                     "calt": 0
