@@ -5,5 +5,9 @@
 
 --hyperlink-format=vscode
 
---type-add
-net:include:cs,msbuild
+--type-add=net:include:cs,msbuild
+
+--type-add=sln:*.sln
+
+--type-add=proj:*.*proj
+--type-add=proj:*.{props,targets}

@@ -5,5 +5,9 @@
 
 --hyperlink-format=vscode://file//{wslprefix}{path}:{line}:{column}
 
---type-add
-net:include:cs,msbuild
+--type-add=net:include:cs,msbuild
+
+--type-add=sln:*.sln
+
+--type-add=proj:*.*proj
+--type-add=proj:*.{props,targets}
