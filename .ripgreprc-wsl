@@ -7,6 +7,8 @@
 
 --type-add=net:include:cs,msbuild
 
+--type-add=cake:*.cake
+--type-add=dbml:*.dbml
 --type-add=sln:*.sln
 
 --type-add=proj:*.*proj
