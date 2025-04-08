@@ -1,5 +1,6 @@
 
 alias ll='ls -alF'
+alias rm-binobj='find -type d \( -name bin -o -name obj \) -exec rm -r {} +'
 
 test -f ~/.cargo/env && source ~/.cargo/env
 

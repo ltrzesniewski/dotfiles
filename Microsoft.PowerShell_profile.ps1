@@ -26,3 +26,9 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
+
+# Custom functions
+
+function Remove-BinObj {
+    Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
+}
