@@ -21,6 +21,15 @@ mkdir -p ~/bin
 wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O ~/bin/oh-my-posh
 chmod +x ~/bin/oh-my-posh
 
+# Install APT packages
+
+if command -v apt &> /dev/null; then
+    startInstall "APT packages"
+    sudo apt update
+    sudo apt dist-upgrade -y
+    sudo apt install -y fzf jq
+fi
+
 # Install dotnet tools
 
 startInstall "C# REPL"

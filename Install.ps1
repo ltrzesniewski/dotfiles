@@ -15,6 +15,15 @@ Function Install-App {
     }
 }
 
+Function Install-WinGet {
+    param (
+        [string]$AppName,
+        [string]$PackageName
+    )
+
+    Install-App $AppName { winget install --source winget --silent $PackageName } -ValidExitCodes @(0x8A15002B)
+}
+
 # Add profile script
 
 if (!(Test-Path -Path $PROFILE)) {
@@ -25,11 +34,12 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
     Add-Content -Path $PROFILE -Value ". ~/dotfiles/Microsoft.PowerShell_profile.ps1"
 }
 
-# Install apps
+# Install WinGet apps
 
-Install-App "PowerShell" { winget install --source winget --silent Microsoft.Powershell } -ValidExitCodes @(0x8A15002B)
-Install-App "OhMyPosh" { winget install --source winget --silent JanDeDobbeleer.OhMyPosh } -ValidExitCodes @(0x8A15002B)
-Install-App "jq" { winget install --source winget --silent jqlang.jq } -ValidExitCodes @(0x8A15002B)
+Install-WinGet "PowerShell" "Microsoft.Powershell"
+Install-WinGet "OhMyPosh" "JanDeDobbeleer.OhMyPosh"
+Install-WinGet "fzf" "fzf"
+Install-WinGet "jq" "jqlang.jq"
 
 # Install dotnet tools
 
