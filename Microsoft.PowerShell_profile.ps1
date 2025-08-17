@@ -32,3 +32,7 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
 function Remove-BinObj {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
+
+# Aliases
+
+Set-Alias ll Get-ChildItem
