@@ -9,6 +9,7 @@
 
 --type-add=cake:*.cake
 --type-add=dbml:*.dbml
+--type-add=xaml:*.xaml
 --type-add=sln:*.sln
 
 --type-add=proj:*.*proj
