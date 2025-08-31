@@ -21,7 +21,7 @@
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
           "foreground": "#211717",
-          "background": "#A67B5B",
+          "background": "#ECB176",
           "template": " {{ if .SSHSession }}\uf817{{ else }}\uf503{{ end }} {{ .UserName }}@{{ .HostName }} "
         },
         {
@@ -29,7 +29,7 @@
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
           "foreground": "#211717",
-          "background": "#ECB176",
+          "background": "#FED8B1",
           "properties": {
             "style": "full"
           },
@@ -37,21 +37,21 @@
         },
         {
           "type": "git",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b0",
+          "style": "diamond",
+          "leading_diamond": " \ue0b6",
+          "trailing_diamond": "\ue0b4",
           "foreground": "#211717",
-          "background": "#FED8B1",
+          "background": "#ECB176",
           "properties": {
             "branch_icon": "\ue725"
           },
-          "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
+          "template": "{{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }}"
         },
         {
           "type": "status",
           "style": "diamond",
           "leading_diamond": " \ue0b6",
           "trailing_diamond": "\ue0b4",
-          "powerline_symbol": "\ue0b0",
           "foreground": "#FCF0C8",
           "background": "#911F27",
           "template": "\ue20f {{ .String }}"
