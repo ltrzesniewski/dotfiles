@@ -13,23 +13,23 @@
         {
           "type": "os",
           "style": "plain",
-          "foreground": "#FFEE58",
+          "foreground": "#FED8B1",
           "template": "{{ if .Root }}\uf0e7 {{ end }}{{ .Icon }}"
         },
         {
           "type": "session",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#262B44",
-          "background": "#F3AE35",
+          "foreground": "#211717",
+          "background": "#A67B5B",
           "template": " {{ if .SSHSession }}\uf817{{ else }}\uf503{{ end }} {{ .UserName }}@{{ .HostName }} "
         },
         {
           "type": "path",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#100e23",
-          "background": "#91ddff",
+          "foreground": "#211717",
+          "background": "#ECB176",
           "properties": {
             "style": "full"
           },
@@ -39,8 +39,8 @@
           "type": "git",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#193549",
-          "background": "#95ffa4",
+          "foreground": "#211717",
+          "background": "#FED8B1",
           "properties": {
             "branch_icon": "\ue725"
           },
@@ -48,11 +48,13 @@
         },
         {
           "type": "status",
-          "style": "powerline",
+          "style": "diamond",
+          "leading_diamond": " \ue0b6",
+          "trailing_diamond": "\ue0b4",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#ffffff",
-          "background": "#ff8080",
-          "template": " \ue20f {{ .String }} "
+          "foreground": "#FCF0C8",
+          "background": "#911F27",
+          "template": "\ue20f {{ .String }}"
         }
       ]
     },
@@ -62,13 +64,13 @@
         {
           "type": "executiontime",
           "style": "plain",
-          "foreground": "#fefefe",
+          "foreground": "#ECB176",
           "background": "transparent",
           "properties": {
             "threshold": 500,
             "style": "austin"
           },
-          "template": " <#F3AE35>\ufbab</> {{ .FormattedMs }}"
+          "template": " <#A67B5B>\ufbab</> {{ .FormattedMs }}"
         }
       ]
     }
