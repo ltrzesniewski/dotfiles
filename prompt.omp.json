@@ -4,6 +4,13 @@
   "console_title_template": "{{ if .Root }}\u26a1 {{ end }}{{ .Folder }}{{ if .Segments.Session.SSHSession }}@{{ .HostName }}{{ end }}",
   "final_space": true,
   "pwd": "osc99",
+  "palette": {
+    "text": "#211717",
+    "darkest": "#6F4E37",
+    "dark": "#A67B5B",
+    "mid": "#ECB176",
+    "light": "#FED8B1"
+  },
   "blocks": [
     {
       "type": "prompt",
@@ -13,23 +20,24 @@
         {
           "type": "os",
           "style": "plain",
-          "foreground": "#FED8B1",
+          "foreground": "p:light",
+          "background": "transparent",
           "template": "{{ if .Root }}\uf0e7 {{ end }}{{ .Icon }}"
         },
         {
           "type": "session",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#211717",
-          "background": "#ECB176",
+          "foreground": "p:text",
+          "background": "p:mid",
           "template": " {{ if .SSHSession }}\uf817{{ else }}\uf503{{ end }} {{ .UserName }}@{{ .HostName }} "
         },
         {
           "type": "path",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "foreground": "#211717",
-          "background": "#FED8B1",
+          "foreground": "p:text",
+          "background": "p:light",
           "properties": {
             "style": "full"
           },
@@ -38,10 +46,10 @@
         {
           "type": "git",
           "style": "diamond",
-          "leading_diamond": "<r>\ue0b0</>",
+          "leading_diamond": "<transparent>\ue0b0</>",
           "trailing_diamond": "\ue0b0",
-          "foreground": "#211717",
-          "background": "#ECB176",
+          "foreground": "p:text",
+          "background": "p:mid",
           "properties": {
             "branch_icon": "\ue725"
           },
@@ -64,13 +72,13 @@
         {
           "type": "executiontime",
           "style": "plain",
-          "foreground": "#ECB176",
+          "foreground": "p:mid",
           "background": "transparent",
           "properties": {
             "threshold": 500,
             "style": "austin"
           },
-          "template": " <#A67B5B>\ufbab</> {{ .FormattedMs }}"
+          "template": " <p:dark>\ufbab</> {{ .FormattedMs }}"
         }
       ]
     }
