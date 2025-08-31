@@ -38,14 +38,14 @@
         {
           "type": "git",
           "style": "diamond",
-          "leading_diamond": " \ue0b6",
-          "trailing_diamond": "\ue0b4",
+          "leading_diamond": "<r>\ue0b0</>",
+          "trailing_diamond": "\ue0b0",
           "foreground": "#211717",
           "background": "#ECB176",
           "properties": {
             "branch_icon": "\ue725"
           },
-          "template": "{{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }}"
+          "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
         },
         {
           "type": "status",
