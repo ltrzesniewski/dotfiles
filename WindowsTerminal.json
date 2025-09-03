@@ -1,6 +1,8 @@
 {
     "copyFormatting": "none",
     "copyOnSelect": false,
+    "experimental.scrollToChangeOpacity": false,
+    "experimental.scrollToZoom": false,
     "language": "en-US",
     "launchMode": "maximized",
     "profiles": {
