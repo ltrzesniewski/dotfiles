@@ -21,7 +21,7 @@ Function Install-WinGet {
         [string]$PackageName
     )
 
-    Install-App $AppName { winget install --source winget --silent $PackageName } -ValidExitCodes @(0x8A15002B)
+    Install-App $AppName { winget install --source winget --silent --exact $PackageName } -ValidExitCodes @(0x8A15002B)
 }
 
 # Add profile script
@@ -36,7 +36,7 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 # Install WinGet apps
 
-Install-WinGet "PowerShell" "Microsoft.Powershell"
+Install-WinGet "PowerShell" "Microsoft.PowerShell"
 Install-WinGet "OhMyPosh" "JanDeDobbeleer.OhMyPosh"
 Install-WinGet "fzf" "fzf"
 Install-WinGet "jq" "jqlang.jq"
