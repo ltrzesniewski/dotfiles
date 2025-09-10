@@ -33,6 +33,10 @@ function Remove-BinObj {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
 
+function fdf {
+    fd --type=f --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
+}
+
 # Aliases
 
 Set-Alias ll Get-ChildItem
