@@ -1,0 +1,16 @@
+[theme]
+name = "coffee"
+parent = "autumn"
+
+[colors]
+AlertInfo = "#A67B5B"
+AlertWarn = "#FED8B1"
+AlertError = "#ECB176"
+
+Annotation = "#6F4E37"
+Guidance = "#ECB176"
+Important = "#FED8B1"
+
+# Title = ""
+# Base = ""
+# Muted = ""
