@@ -38,23 +38,23 @@ command -v dotnet &> /dev/null && dotnet tool update -g csharprepl
 # Install Rust apps
 
 startInstall "rust update"
-command -v rustup &> /dev/null && rustup update stable
+command -v rustup &> /dev/null && rustup update
 
 if command -v cargo &> /dev/null; then
     startInstall atuin
-    cargo install atuin
+    cargo install --locked atuin
 
     startInstall bat
-    cargo install bat
+    cargo install --locked bat
 
     startInstall btm
-    cargo install bottom
+    cargo install --locked bottom
 
     startInstall fd
-    cargo install fd-find
+    cargo install --locked fd-find
 
     startInstall ripgrep
-    cargo install ripgrep --features pcre2
+    cargo install --locked ripgrep --features pcre2
 fi
 
 echo

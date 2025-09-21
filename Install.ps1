@@ -50,15 +50,15 @@ if (Get-Command "dotnet" -ErrorAction SilentlyContinue) {
 # Install Rust apps
 
 if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
-    Install-App "rust update" { rustup update stable }
+    Install-App "rust update" { rustup update }
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
-    Install-App "atuin" { cargo install --git https://github.com/ltrzesniewski/atuin.git --branch powershell-pr }
-    Install-App "bat" { cargo install bat }
-    Install-App "btm" { cargo install bottom }
-    Install-App "fd" { cargo install fd-find }
-    Install-App "ripgrep" { cargo install ripgrep --features pcre2 }
+    Install-App "atuin" { cargo install --locked --git https://github.com/ltrzesniewski/atuin.git --branch powershell-pr }
+    Install-App "bat" { cargo install --locked bat }
+    Install-App "btm" { cargo install --locked bottom }
+    Install-App "fd" { cargo install --locked fd-find }
+    Install-App "ripgrep" { cargo install --locked ripgrep --features pcre2 }
 }
 
 Write-Host ""

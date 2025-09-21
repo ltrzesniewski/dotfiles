@@ -1,5 +1,7 @@
 .bashrc eol=lf
 .inputrc eol=lf
 .ripgreprc eol=lf
+.ripgreprc-wsl eol=lf
 
 *.sh eol=lf
+*.bash eol=lf
