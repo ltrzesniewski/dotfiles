@@ -20,4 +20,4 @@ export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 
 source ~/dotfiles/bash/.bash-preexec.sh
-command -v atuin &> /dev/null && source <(atuin init bash --disable-up-arrow)
+command -v atuin &> /dev/null && source <(atuin init bash)

@@ -5,7 +5,7 @@ if (Get-Command oh-my-posh -ErrorAction Ignore) {
 
 if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAction Ignore)) {
     $env:ATUIN_CONFIG_DIR = "$PSScriptRoot/atuin"
-    atuin init powershell --disable-up-arrow | Out-String | Invoke-Expression
+    atuin init powershell | Out-String | Invoke-Expression
 }
 
 if (Get-Command kubectl -ErrorAction Ignore) {
