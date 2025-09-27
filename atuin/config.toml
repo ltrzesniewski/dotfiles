@@ -76,6 +76,7 @@ filter_mode_shell_up_key_binding = "session"
 ## when atuin is invoked from a shell up-key binding
 ## the accepted values are identical to those of "inline_height"
 # inline_height_shell_up_key_binding = 0
+inline_height_shell_up_key_binding = 10
 
 ## Invert the UI - put the search bar at the top , Default to `false`
 # invert = false
@@ -137,6 +138,7 @@ show_numeric_shortcuts = false
 ## version (and whether an update is available), a keymap hint, and the total
 ## amount of commands in your history.
 # show_help = true
+show_help = false
 
 ## Configure whether or not to show tabs for search and inspect
 # show_tabs = true
@@ -147,6 +149,7 @@ show_numeric_shortcuts = false
 ## of keyboard shortcuts to switch tab. 0 to never auto-hide, default is 8 (lines).
 ## This is ignored except in `compact` mode.
 # auto_hide_height = 8
+auto_hide_height = 20
 
 ## Defaults to true. This matches history against a set of default regex, and will not save it if we get a match. Defaults include
 ## 1. AWS key id
