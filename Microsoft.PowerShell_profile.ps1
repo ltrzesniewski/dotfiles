@@ -40,3 +40,8 @@ function fdf {
 # Aliases
 
 Set-Alias ll Get-ChildItem
+
+# Key bindings
+
+Set-PSReadLineKeyHandler -Chord "Ctrl+UpArrow" -Function PreviousHistory
+Set-PSReadLineKeyHandler -Chord "Ctrl+DownArrow" -Function NextHistory
