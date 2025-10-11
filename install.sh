@@ -47,9 +47,6 @@ if command -v cargo &> /dev/null; then
     startInstall bat
     cargo install --locked bat
 
-    startInstall btm
-    cargo install --locked bottom
-
     startInstall fd
     cargo install --locked fd-find
 
