@@ -19,7 +19,7 @@ export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 
-source ~/dotfiles/bash/blesh/ble.sh
+source ~/dotfiles/bash/blesh/ble.sh --rcfile ~/dotfiles/bash/.blerc
 command -v atuin &> /dev/null && source <(atuin init bash)
 
 fdf() {
