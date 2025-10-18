@@ -8,7 +8,28 @@
 #
 # Source: /lib/test-main.sh
 ble-import lib/core-test
-ble/test/start-section 'ble/main' 19
+ble/test/start-section 'ble/main' 29
+(
+  function f1 {
+    builtin eval -- "$_ble_bash_POSIXLY_CORRECT_local_adjust"
+    ble/util/setexit 123
+    builtin eval -- "$_ble_bash_POSIXLY_CORRECT_local_return"
+  }
+  function f2 {
+    builtin eval -- "$_ble_bash_POSIXLY_CORRECT_local_adjust"
+    [[ ! -o posix ]]
+    builtin eval -- "$_ble_bash_POSIXLY_CORRECT_local_return"
+  }
+  set +o posix
+  ble/test 'f1' exit=123
+  ble/test 'f2'
+  ble/test 'f1; [[ ! -o posix ]]'
+  ble/test 'f2; [[ ! -o posix ]]'
+  ble/test 'set -o posix; f1;                 ret=$?; set +o posix' ret=123
+  ble/test 'set -o posix; f2;                 ret=$?; set +o posix' ret=0
+  ble/test 'set -o posix; f1; [[ -o posix ]]; ret=$?; set +o posix' ret=0
+  ble/test 'set -o posix; f2; [[ -o posix ]]; ret=$?; set +o posix' ret=0
+)
 (
   ble/test ble/util/put a     stdout=a
   ble/test ble/util/print a   stdout=a
@@ -21,20 +42,24 @@ ble/test/start-section 'ble/main' 19
            stdout='c d'
 )
 (
-  function ble/test/dummy-1 { true; }
-  function ble/test/dummy-2 { true; }
-  function ble/test/dummy-3 { true; }
+  function ble/test/dummy-1 { return 0; }
+  function ble/test/dummy-2 { return 0; }
+  function ble/test/dummy-3 { return 0; }
   ble/test ble/bin#has ble/test/dummy-1
   ble/test ble/bin#has ble/test/dummy-{1..3}
   ble/test ble/bin#has ble/test/dummy-0 exit=1
   ble/test ble/bin#has ble/test/dummy-{0..2} exit=1
+  alias ble_test_dummy_4=echo
+  shopt -u expand_aliases
+  ble/test '! ble/bin#has ble_test_dummy_4'
+  shopt -s expand_aliases
+  ble/test 'ble/bin#has ble_test_dummy_4'
 )
 (
   if [[ $OSTYPE == msys* ]]; then
-    ble/path#append MSYS winsymlinks
-    export MSYS
+    export MSYS=${MSYS:+$MSYS }winsymlinks
   fi
-  ble/bin/.freeze-utility-path readlink ls
+  ble/bin#freeze-utility-path readlink ls
   function ble/test:readlink.impl1 {
     ret=$1
     ble/util/readlink/.resolve-loop
@@ -45,7 +70,7 @@ ble/test/start-section 'ble/main' 19
     ble/util/readlink/.resolve-loop
     ble/function#pop ble/bin/readlink
   }
-  ble/test/chdir
+  ble/test/chdir || exit
   cd -P .
   command mkdir -p ab/cd/ef
   command touch ab/cd/ef/file.txt

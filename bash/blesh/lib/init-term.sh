@@ -9,7 +9,7 @@
 # Source: /lib/init-term.sh
 _ble_term_tput=
 function ble/init:term/tput { return 1; }
-if ble/bin/.freeze-utility-path tput; then
+if ble/bin#freeze-utility-path tput; then
   ble/bin/tput cuu 1 &>/dev/null && _ble_term_tput=${_ble_term_tput}i
   ble/bin/tput UP  1 &>/dev/null && _ble_term_tput=${_ble_term_tput}c
   if [[ $_ble_term_tput ]]; then
@@ -118,10 +118,12 @@ function ble/init:term/initialize {
   _ble_term_vpa=${_ble_term_vpa//123/%y}
   _ble_term_vpa=${_ble_term_vpa//124/%l}
   ble/init:term/define-cap _ble_term_clear $'\e[H\e[2J' clear:cl
+  _ble_term_clear=${_ble_term_clear//$'\e[3J'}
   ble/init:term/define-cap _ble_term_il $'\e[%dL' il:AL 123
   ble/init:term/define-cap _ble_term_dl $'\e[%dM' -c dl:DL 123
   _ble_term_il=${_ble_term_il//123/%d}
   _ble_term_dl=${_ble_term_dl//123/%d}
+  [[ ${TERM%%-*} == eterm ]] && _ble_term_il=$'\r\e[%dL' _ble_term_dl=$'\r\e[%dM'
   ble/init:term/define-cap _ble_term_el  $'\e[K'  el:ce
   ble/init:term/define-cap _ble_term_el1 $'\e[1K' el1:cb
   if [[ $_ble_term_el == $'\e[K' && $_ble_term_el1 == $'\e[1K' ]]; then
@@ -142,15 +144,30 @@ function ble/init:term/initialize {
   [[ $TERM == minix ]] && _ble_term_sc= _ble_term_rc=
   ble/init:term/define-cap _ble_term_Ss '' Ss:Ss 123 # DECSCUSR
   _ble_term_Ss=${_ble_term_Ss//123/@1}
-  ble/init:term/define-cap _ble_term_cvvis $'\e[?25h' cvvis:vs
-  ble/init:term/define-cap _ble_term_civis $'\e[?25l' civis:vi
-  [[ $TERM == minix ]] && _ble_term_cvvis= _ble_term_civis=
-  [[ $_ble_term_cvvis == $'\e[?12;25h' || $_ble_term_cvvis == $'\e[?25;12h' ]] &&
-    _ble_term_cvvis=$'\e[?25h'
-  [[ $_ble_term_cvvis == $'\e[34l'* && $_ble_term_civis != *$'\e[34h'* ]] &&
-    _ble_term_civis=$_ble_term_civis$'\e[34h'
-  [[ $_ble_term_civis == $'\e[?25l'* && $_ble_term_cvvis != *$'\e[?25h'* ]] &&
-    _ble_term_cvvis=$_ble_term_cvvis$'\e[?25h'
+  ble/init:term/define-cap _ble_term_civis '' civis:vi
+  ble/init:term/define-cap _ble_term_cnorm '' cnorm:ve
+  ble/init:term/define-cap _ble_term_cvvis '' cvvis:vs
+  ble/init:term/register-varname _ble_term_rmcivis
+  if ble/string#match "$_ble_term_civis" $'^((\e\\[[<=>?]?[0-9;]+)[hl])+$'; then
+    local s=$_ble_term_civis
+    _ble_term_civis=
+    _ble_term_rmcivis=
+    while ble/string#match "$s" $'^(\e\\[[<=>?]?[0-9]+)[hl]'; do
+      s=${s:${#BASH_REMATCH}}
+      _ble_term_civis=$_ble_term_civis$BASH_REMATCH
+      if [[ $BASH_REMATCH == *l ]]; then
+        _ble_term_rmcivis=$_ble_term_rmcivis${BASH_REMATCH[1]}h
+      else
+        _ble_term_rmcivis=$_ble_term_rmcivis${BASH_REMATCH[1]}l
+      fi
+    done
+  elif [[ $_ble_term_civis == *$'\e[?25l'* || ! $_ble_term_civis && $TERM != minix ]]; then
+    _ble_term_rmcivis=$'\e[?25h'
+    _ble_term_civis=$'\e[?25l'
+  else
+    _ble_term_civis=
+    _ble_term_rmcivis=
+  fi
   ble/init:term/define-cap _ble_term_smcup '' smcup:ti # \e[?1049h
   ble/init:term/define-cap _ble_term_rmcup '' rmcup:te # \e[?1049l
   ble/init:term/define-cap _ble_term_tsl '' tsl:ts
@@ -185,7 +202,7 @@ function ble/init:term/initialize {
   else
     _ble_term_sgr_rev_reset=
   fi
-  ble/init:term/define-cap _ble_term_colors 256 colors:Co
+  ble/init:term/define-cap _ble_term_colors 8 colors:Co
   local i
   _ble_term_setaf=()
   _ble_term_setab=()

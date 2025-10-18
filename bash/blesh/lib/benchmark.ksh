@@ -157,11 +157,17 @@ _ble_measure__read_arguments() {
 ##   @var[out] nsec
 ##     実行時間を nsec 単位で返します。
 ble_measure() {
+  eval -- "${_ble_bash_POSIXLY_CORRECT_local_adjust-}"
   typeset __ble_level=${#FUNCNAME[@]} __ble_base=
   [[ ${ZSH_VERSION-} ]] && __ble_level=${#funcstack[@]}
   typeset flags= command= count=$_ble_measure_count
   typeset measure_threshold=$_ble_measure_threshold
-  _ble_measure__read_arguments "$@" || return "$?"
+  _ble_measure__read_arguments "$@"; typeset ext=$?
+  if ((ext)); then
+    eval -- "${_ble_bash_POSIXLY_CORRECT_local_leave-}"
+    return "$ext"
+  fi
+
   if [[ $flags == *h* ]]; then
     _ble_util_print_lines \
       'usage: ble_measure [-q|-ac COUNT|-TB TIME] [--] COMMAND' \
@@ -182,6 +188,7 @@ ble_measure() {
       '  Exit status:' \
       '    Returns 1 for the failure in measuring the time.  Returns 2 after printing' \
       '    help.  Otherwise, returns 0.'
+    eval -- "${_ble_bash_POSIXLY_CORRECT_local_leave-}"
     return 2
   fi
 
@@ -231,7 +238,10 @@ ble_measure() {
 
     typeset utot=0
     [[ $flags != *V* ]] && printf '%s (x%d)...' "$command" "$n" >&2
-    _ble_measure__time "$n" "$command" || return 1
+    if ! _ble_measure__time "$n" "$command"; then
+      eval -- "${_ble_bash_POSIXLY_CORRECT_local_leave-}"
+      return 1
+    fi
     [[ $flags != *V* ]] && printf '\r\e[2K' >&2
     ((utot=ret,utot>=measure_threshold||n==__ble_max_n)) || continue
 
@@ -256,7 +266,7 @@ ble_measure() {
       fi
     fi
 
-    # upate base if the result is shorter than base
+    # update base if the result is shorter than base
     if ((min_utot<0x7FFFFFFFFFFFFFFF/1000)); then
       typeset __ble_real=$((min_utot*1000/n))
       [[ ${_ble_measure_base_real[__ble_level]} ]] &&
@@ -273,7 +283,7 @@ ble_measure() {
     if [[ $flags != *q* ]]; then
       typeset reso=$_ble_measure_resolution
       typeset awk=ble/bin/awk
-      type "$awk" &>/dev/null || awk=awk
+      type -- "$awk" &>/dev/null || awk=awk
       typeset -x title="$command (x$n)"
       "$awk" -v utot="$utot" -v nsec0="$nsec0" -v n="$n" -v reso="$reso" '
         function genround(x, mod) { return int(x / mod + 0.5) * mod; }
@@ -289,6 +299,8 @@ ble_measure() {
     fi
     ((out-=nsec0/1000,nsec-=nsec0))
     ret=$out
+    eval -- "${_ble_bash_POSIXLY_CORRECT_local_leave-}"
     return 0
   done
+  eval -- "${_ble_bash_POSIXLY_CORRECT_local_return-}"
 }

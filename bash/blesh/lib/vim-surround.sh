@@ -7,7 +7,7 @@
 # "akinomyoga/ble.sh".
 #
 # Source: /lib/vim-surround.sh
-source "$_ble_base/keymap/vi.sh"
+ble-import keymap.vi
 bleopt/declare -n vim_surround_45 $'$(\r)' # ysiw-
 bleopt/declare -n vim_surround_61 $'$((\r))' # ysiw=
 bleopt/declare -n vim_surround_q \" # ysiwQ
@@ -72,7 +72,7 @@ function ble/lib/vim-surround.sh/load-template {
   local optname=bleopt_vim_surround_$ret
   template=${!optname}
   [[ $template ]] && return 0
-  case "$ins" in
+  case $ins in
   (['<tT']*)
     local tag=${ins:1}; tag=${tag//$'\r'/' '}
     if [[ ! $tag ]]; then
@@ -137,7 +137,7 @@ function ble/lib/vim-surround.sh/surround {
 function ble/lib/vim-surround.sh/async-read-tagname {
   ble/keymap:vi/async-commandline-mode "$1"
   _ble_edit_PS1='<'
-  _ble_keymap_vi_cmap_before_command=ble/lib/vim-surround.sh/async-read-tagname/.before-command.hook
+  _ble_keymap_vi_cmap_before_widget=ble/lib/vim-surround.sh/async-read-tagname/.before-command.hook
   return 147
 }
 function ble/lib/vim-surround.sh/async-read-tagname/.before-command.hook {
@@ -308,7 +308,7 @@ function ble/keymap:vi/operator:ysurround.repeat {
   local ins=${_ble_keymap_vi_repeat[11]}
   ble/widget/vim-surround.sh/ysurround.core "$ins"
 }
-function ble/keymap:vi/operator:surround.record { :; }
+function ble/keymap:vi/operator:surround.record { return 0; }
 function ble/keymap:vi/operator:surround {
   local beg=$1 end=$2 context=$3
   local content=$surround_content ins=$surround_ins trims=$surround_trim
@@ -349,7 +349,7 @@ function ble/widget/vim-surround.sh/nmap/csurround.set-delimiter {
     del='t' trim=1
   fi
   local obj1= obj2=
-  case "$del" in
+  case $del in
   ([wWps])      obj1=i$del obj2=i$del ;;
   ([\'\"\`])    obj1=i$del obj2=a$del arg=1 ;;
   (['bB)}>]t']) obj1=i$del obj2=a$del ;;
@@ -525,7 +525,7 @@ function ble/widget/vim-surround.sh/omap {
   ble/util/c2s "$ret"; local s=$ret
   local opfunc=${_ble_keymap_vi_opfunc%%:*}$s
   local opflags=${_ble_keymap_vi_opfunc#*:}
-  case "$opfunc" in
+  case $opfunc in
   (y[sS])
     local ARG FLAG REG; ble/keymap:vi/get-arg 1
     _ble_edit_arg=$ARG

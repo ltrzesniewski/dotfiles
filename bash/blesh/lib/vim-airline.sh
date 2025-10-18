@@ -7,7 +7,7 @@
 # "akinomyoga/ble.sh".
 #
 # Source: /lib/vim-airline.sh
-ble-import keymap/vi
+ble-import keymap.vi
 ble-import prompt-git
 bleopt/declare -n vim_airline_theme dark
 function bleopt/check:vim_airline_theme {

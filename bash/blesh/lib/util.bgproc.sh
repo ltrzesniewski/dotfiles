@@ -71,7 +71,7 @@ function ble/util/bgproc#start {
   then
     bgproc[0]=$_ble_local_bgproc0
     bgproc[1]=$_ble_local_bgproc1
-    ble/util/assign 'bgproc[4]' '(set -m; ble/util/bgproc/.exec __ble_suppress_joblist__ >/dev/null & bgpid=$!; ble/util/print "$bgpid")'
+    ble/util/assign 'bgproc[4]' '(set -m; ble/util/joblist/__suppress__; ble/util/bgproc/.exec >/dev/null & bgpid=$!; ble/util/print "$bgpid")'
     if ble/util/bgproc/.alive; then
       [[ :${bgproc[3]}: == *:no-close-on-unload:* ]] ||
         ble/util/print "-${bgproc[4]}" >| "${bgproc_fname[2]}"
@@ -99,10 +99,18 @@ function ble/util/bgproc#start {
   return "$_ble_local_ext"
 }
 function ble/util/bgproc#stop/.kill {
-  local pid=$1 i close_timeout=$2
-  ble/util/conditional-sync '' '((1))' 1000 progressive-weight:pid="$pid":no-wait-pid:timeout="$close_timeout"
+  local pid=$1 opts=$2 ret
+  local timeout=10000
+  if ble/opts#extract-last-optarg "$opts" kill-timeout; then
+    timeout=$ret
+  fi
+  ble/util/conditional-sync '' '((1))' 1000 progressive-weight:pid="$pid":no-wait-pid:timeout="$timeout"
   kill -0 "$pid" || return 0
-  ble/util/conditional-sync '' '((1))' 1000 progressive-weight:pid="$pid":no-wait-pid:SIGKILL:timeout=10000
+  local timeout=10000
+  if ble/opts#extract-last-optarg "$opts" kill9-timeout; then
+    timeout=$ret
+  fi
+  ble/util/conditional-sync '' '((1))' 1000 progressive-weight:pid="$pid":no-wait-pid:timeout="$timeout":SIGKILL
 }
 function ble/util/bgproc#stop {
   local prefix=$1
@@ -121,11 +129,7 @@ function ble/util/bgproc#stop {
   ble/fd#close 'bgproc[1]'
   >| "${bgproc_fname[2]}"
   if ble/util/bgproc/.alive; then
-    local ret close_timeout=10000
-    if ble/opts#extract-last-optarg "${bgproc[3]}" kill-timeout; then
-      close_timeout=$ret
-    fi
-    (ble/util/nohup 'ble/util/bgproc#stop/.kill "-${bgproc[4]}" "$close_timeout"')
+    (ble/util/nohup 'ble/util/bgproc#stop/.kill "-${bgproc[4]}" "${bgproc[3]}"')
   fi
   builtin eval -- "${prefix}_bgproc[0]="
   builtin eval -- "${prefix}_bgproc[1]="
@@ -133,9 +137,12 @@ function ble/util/bgproc#stop {
   return 0
 }
 function ble/util/bgproc#alive {
-  local bgpid_ref=${1}_bgproc[4]
-  [[ ${!bgpid_ref-} ]] || return 2
-  kill -0 "${!bgpid_ref}" 2>/dev/null
+  local prefix=$1 bgproc
+  ble/util/restore-vars "${prefix}_" bgproc
+  ((${#bgproc[@]})) || return 2
+  [[ ${bgproc[4]-} ]] || return 1
+  kill -0 "${bgproc[4]}" 2>/dev/null || return 3
+  return 0
 }
 function ble/util/bgproc#keepalive/.timeout {
   local prefix=$1

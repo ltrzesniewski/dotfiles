@@ -39,17 +39,17 @@ function ble/test/log#open {
     local h10=----------
     [[ -s $file ]] &&
       ble/util/print "$h10$h10$h10$h10$h10$h10$h10" >&"$_ble_test_logfile_fd"
-    ble/util/print "[$(date +'%F %T %Z')] test: start logging" >&"$_ble_test_logfile_fd"
+    ble/util/strftime "[%F %T %Z] test: start logging" >&"$_ble_test_logfile_fd"
   fi
 }
 function ble/test/log#close {
   if [[ $_ble_test_logfile_fd ]]; then
-    ble/util/print "[$(date +'%F %T %Z')] test: end logging" >&"$_ble_test_logfile_fd"
+    ble/util/strftime "[%F %T %Z] test: end logging" >&"$_ble_test_logfile_fd"
     ble/fd#close _ble_test_logfile_fd
     _ble_test_logfile_fd=
   fi
 }
-if ble/bin/.freeze-utility-path colored; then
+if ble/bin#freeze-utility-path colored; then
   function ble/test/diff.impl {
     ble/bin/colored diff -u "$@"
   }
@@ -65,6 +65,7 @@ function ble/test/diff {
   local f1=$BASHPID.$1.expect
   local f2=$BASHPID.$1.result
   (
+    ble/util/joblist/__suppress__
     cd "$dir"
     ble/util/print "$2" >| "$f1"
     ble/util/print "$3" >| "$f2"
@@ -73,6 +74,7 @@ function ble/test/diff {
     >| "$f1" >| "$f2"
   )
 }
+_ble_test_section_failure_count=0
 _ble_test_section_fd=
 _ble_test_section_file=
 _ble_test_section_title=section
@@ -93,14 +95,13 @@ function ble/test/end-section {
   _ble_test_section_fd=
   local ntest npass count=$_ble_test_section_count
   local ntest nfail npass
-  builtin eval -- $(
-    ble/bin/awk '
-      BEGIN{test=0;fail=0;pass=0;}
-      /^test /{test++}
-      /^fail /{fail++}
-      /^pass /{pass++}
-      END{print "ntest="test" nfail="fail" npass="pass;}
-    ' "$_ble_test_section_file")
+  local awk_script='
+    BEGIN{test=0;fail=0;pass=0;}
+    /^test /{test++}
+    /^fail /{fail++}
+    /^pass /{pass++}
+    END{print "ntest="test" nfail="fail" npass="pass;}'
+  ble/util/eval-stdout 'ble/bin/awk "$awk_script" "$_ble_test_section_file"'
   local sgr=$'\e[32m' sgr0=$'\e[m'
   ((npass==ntest)) || sgr=$'\e[31m'
   local ncrash=$((ntest-nfail-npass))
@@ -112,7 +113,12 @@ function ble/test/end-section {
     local percentage=---.-%
   fi
   ble/test/log "$sgr$percentage$sgr0 [section] $_ble_test_section_title: $sgr$npass/$ntest$sgr0 ($nfail fail, $ncrash crash, $nskip skip)"
-  ((npass==ntest))
+  if ((npass==ntest)); then
+    return 0
+  else
+    ((_ble_test_section_failure_count++))
+    return 1
+  fi
 }
 function ble/test/section#incr {
   local title=$1

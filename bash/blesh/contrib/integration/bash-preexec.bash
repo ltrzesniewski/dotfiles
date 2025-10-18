@@ -23,19 +23,21 @@
 ##   @var __bp_trapdebug_string
 ##   @var __bp_install_string
 
-function ble/contrib:integration/bash-preexec/add-convenience-functions {
+function ble/contrib/integration:bash-preexec/add-convenience-functions {
   ble/array#remove precmd_functions  precmd
   ble/array#remove preexec_functions preexec
   ble/array#unshift precmd_functions  precmd
   ble/array#unshift preexec_functions preexec
 }
 
-function ble/contrib:integration/bash-preexec/precmd.hook {
+function ble/contrib/integration:bash-preexec/precmd.hook {
   local _ble_local_lastexit=$? _ble_local_lastarg=$_
 
   # Emulate bash-preexec variables
   __bp_last_ret_value=$_ble_local_lastexit
+  __bp_last_argument_prev_command=$_ble_local_lastarg
   BP_PIPESTATUS=("${BLE_PIPESTATUS[@]}")
+  local __bp_inside_precmd=1
 
   # local __bp_blesh_invoking_through_blesh=1 # XXX
   if ble/is-function __bp_precmd_invoke_functions; then
@@ -44,7 +46,7 @@ function ble/contrib:integration/bash-preexec/precmd.hook {
     # For older bash-preexec.sh / without bash-preexec.sh
     local _ble_local_hook
     for _ble_local_hook in "${precmd_functions[@]}"; do
-      if builtin type -t "$_ble_local_hook" &>/dev/null; then
+      if ble/bin#has "$_ble_local_hook"; then
         ble/util/setexit "$_ble_local_lastexit" "$_ble_local_lastarg"
         "$_ble_local_hook"
       fi
@@ -52,9 +54,11 @@ function ble/contrib:integration/bash-preexec/precmd.hook {
   fi
 }
 
-function ble/contrib:integration/bash-preexec/preexec.hook {
+function ble/contrib/integration:bash-preexec/preexec.hook {
   local _ble_local_lastexit=$? _ble_local_lastarg=$_ _ble_local_command=$1
-  __bp_last_argument_prev_command=$_ble_local_lastarg
+
+  # Emulate bash-preexec variables
+  local __bp_inside_preexec=1
 
   # local __bp_blesh_invoking_through_blesh=1 # XXX
   if ble/is-function __bp_preexec_invoke_functions; then
@@ -63,7 +67,7 @@ function ble/contrib:integration/bash-preexec/preexec.hook {
     # For older bash-preexec.sh / without bash-preexec.sh
     local _ble_local_hook
     for _ble_local_hook in "${preexec_functions[@]}"; do
-      if builtin type -t "$_ble_local_hook" &>/dev/null; then
+      if ble/bin#has "$_ble_local_hook"; then
         ble/util/setexit "$_ble_local_lastexit" "$_ble_local_lastarg"
         "$_ble_local_hook" "$_ble_local_command"
       fi
@@ -71,9 +75,9 @@ function ble/contrib:integration/bash-preexec/preexec.hook {
   fi
 }
 
-## @fn ble/contrib:integration/bash-preexec/attach.hook
+## @fn ble/contrib/integration:bash-preexec/attach.hook
 ##   Remove bash-preexec hooks
-function ble/contrib:integration/bash-preexec/attach.hook {
+function ble/contrib/integration:bash-preexec/attach.hook {
   local BP_TRAPDEBUG_STRING=${__bp_trapdebug_string:-'__bp_preexec_invoke_exec "$_"'}
 
   # Remove bash-preexec preexec hook in builtin DEBUG trap.
@@ -103,25 +107,36 @@ function ble/contrib:integration/bash-preexec/attach.hook {
     fi
 
     # Remove precmd hook from PROMPT_COMMAND
-    PROMPT_COMMAND=${PROMPT_COMMAND/#$BP_PROMPT_COMMAND_PREFIX$'\n'/$'\n'}
-    PROMPT_COMMAND=${PROMPT_COMMAND%$'\n'$BP_PROMPT_COMMAND_SUFFIX}
-    PROMPT_COMMAND=${PROMPT_COMMAND#$'\n'}
+    local i prompt_command
+    for i in "${!PROMPT_COMMAND[@]}"; do
+      prompt_command=${PROMPT_COMMAND[i]}
+      case $prompt_command in
+      ("$BP_PROMPT_COMMAND_PREFIX"|"$BP_PROMPT_COMMAND_SUFFIX")
+        prompt_command= ;;
+      (*)
+        prompt_command=${prompt_command/#"$BP_PROMPT_COMMAND_PREFIX"$'\n'/$'\n'}
+        prompt_command=${prompt_command%$'\n'"$BP_PROMPT_COMMAND_SUFFIX"}
+        prompt_command=${prompt_command#$'\n'}
+      esac
+      PROMPT_COMMAND[i]=$prompt_command
+    done
 
     # Remove preexec hook in the DEBUG trap
     local q="'" Q="'\''" trap_string
     ble/util/assign trap_string 'trap -p DEBUG'
-    if [[ $trap_string == "trap -- '${__bp_trapdebug_string//$q/$Q}' DEBUG" ]]; then
+    if [[ $trap_string == "trap -- '${BP_TRAPDEBUG_STRING//$q/$Q}' DEBUG" ]]; then
       if [[ ${__bp_trap_string-} ]]; then
-        eval -- "$__bp_trap_string"
+        builtin eval -- "$__bp_trap_string"
       else
         trap - DEBUG
       fi
     fi
   fi
 }
+ble/function#trace ble/contrib/integration:bash-preexec/attach.hook
 
-## @fn ble/contrib:integration/bash-preexec/detach.hook
-function ble/contrib:integration/bash-preexec/detach.hook {
+## @fn ble/contrib/integration:bash-preexec/detach.hook
+function ble/contrib/integration:bash-preexec/detach.hook {
   # Reinstall bash-preexec hooks
   local BP_INSTALL_STRING=${__bp_install_string-}
   [[ ! $BP_INSTALL_STRING ]] && ble/is-function __bp_install &&
@@ -132,23 +147,34 @@ function ble/contrib:integration/bash-preexec/detach.hook {
   # Note: 重複して登録される (古い bash-preexec.sh) かもしれないし、全
   # く登録されない (bash-preexec.sh をロードしていない時) かもしれない
   # ので、ble.sh 側で末尾で一回呼び出す形に修正する。
-  ble/contrib:integration/bash-preexec/add-convenience-functions
+  ble/contrib/integration:bash-preexec/add-convenience-functions
 }
 
-ble/contrib:integration/bash-preexec/add-convenience-functions
-blehook PRECMD!=ble/contrib:integration/bash-preexec/precmd.hook
-blehook PREEXEC!=ble/contrib:integration/bash-preexec/preexec.hook
-blehook ATTACH!=ble/contrib:integration/bash-preexec/attach.hook
-blehook DETACH!=ble/contrib:integration/bash-preexec/detach.hook
-if [[ ${bp_imported-${__bp_imported-}} ]]; then
-  ble/contrib:integration/bash-preexec/attach.hook
+ble/contrib/integration:bash-preexec/add-convenience-functions
+blehook PRECMD!=ble/contrib/integration:bash-preexec/precmd.hook
+blehook PREEXEC!=ble/contrib/integration:bash-preexec/preexec.hook
+blehook ATTACH!=ble/contrib/integration:bash-preexec/attach.hook
+blehook DETACH!=ble/contrib/integration:bash-preexec/detach.hook
+if [[ ${bash_preexec_imported-${__bp_imported-}} ]]; then
+  ble/contrib/integration:bash-preexec/attach.hook
 fi
+
+# prevent bash-preexec.sh to be loaded
+blehook ATTACH-=ble/contrib/integration:bash-preexec/loader
+blehook POSTEXEC-=ble/contrib/integration:bash-preexec/loader
+bash_preexec_imported=defined
+__bp_imported=defined
 
 # XXX: 以下は uninstall で削除しきれなかった時の為の保険。今の所不要に思われる。
 # __bp_blesh_check() {
 #   if [[ $BLE_ATTACHED && ! ${__bp_blesh_invoking_through_blesh-} ]]; then
-#     ble/contrib:integration/bash-preexec/attach.hook
+#     ble/contrib/integration:bash-preexec/attach.hook
 #   fi
 # }
 # precmd_function+=(__bp_blesh_check)
 # preexec_function+=(__bp_blesh_check)
+
+# Some settings rely on the internal APIs of bash-preexec.  For example, iTerm2
+# shell integration uses "__bp_set_ret_value" and
+# "$__bp_last_argument_prev_command".
+function __bp_set_ret_value { return ${1:+"$1"}; }

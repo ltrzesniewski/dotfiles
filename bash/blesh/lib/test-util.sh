@@ -8,7 +8,7 @@
 #
 # Source: /lib/test-util.sh
 ble-import lib/core-test
-ble/test/start-section 'ble/util' 1226
+ble/test/start-section 'ble/util' 1275
 (
   ble/test 'bleopt a=1' \
            exit=2
@@ -26,7 +26,7 @@ ble/test/start-section 'ble/util' 1226
   function bleopt/check:a { value=123; }
   ble/test 'bleopt a=4 && bleopt a'
   stdout="bleopt a=123"
-  function bleopt/check:a { false; }
+  function bleopt/check:a { return 1; }
   ble/test 'bleopt a=5' \
            exit=1
   ble/test 'bleopt a' \
@@ -55,37 +55,37 @@ ble/test ble/util/setexit 255 exit=255
 (
   a=1
   function f1 {
-    echo g:$a
+    ble/util/print "g:$a"
     local a=2
-    echo l:$a
+    ble/util/print "l:$a"
     ble/util/unlocal a
-    echo g:$a
+    ble/util/print "g:$a"
     a=3
   }
-  ble/test 'f1; echo g:$a' \
+  ble/test 'f1; ble/util/print "g:$a"' \
            stdout=g:1 \
            stdout=l:2 \
            stdout=g:1 \
            stdout=g:3
   function f2 {
-    echo f1:$a@f2
+    ble/util/print "f1:$a@f2"
     local a=3
-    echo f2:$a@f2
+    ble/util/print "f2:$a@f2"
     ble/util/unlocal a
-    echo f1:$a@f2
+    ble/util/print "f1:$a@f2"
     a=$a+
   }
   function f1 {
-    echo g:$a@f1
+    ble/util/print "g:$a@f1"
     local a=2
-    echo f1:$a@f1
+    ble/util/print "f1:$a@f1"
     f2
-    echo f1:$a@f1
+    ble/util/print "f1:$a@f1"
     ble/util/unlocal a
-    echo g:$a@f1
+    ble/util/print "g:$a@f1"
     a=$a+
   }
-  ble/test 'a=1; f1; echo g:$a@g' \
+  ble/test 'a=1; f1; ble/util/print "g:$a@g"' \
            stdout=g:1@f1 \
            stdout=f1:2@f1 \
            stdout=f1:2@f2 \
@@ -118,7 +118,7 @@ ble/test ble/util/setexit 255 exit=255
 (
   varnames=(name x y count data)
   function print-status {
-    echo "name=$name x=$x y=$y count=$count data=(${data[*]})"
+    ble/util/print "name=$name x=$x y=$y count=$count data=(${data[*]})"
   }
   function f1 {
     local "${varnames[@]/%/=}" # WA #D1570 checked
@@ -194,7 +194,7 @@ ble/test ble/util/setexit 255 exit=255
     ble/test 'ble/is-transformed v' exit=1
   fi
 )
-function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
+function is-global { (builtin readonly "$1"; ! local "$1" 2>/dev/null); }
 (
   v1=1 v2=2
   ((_ble_bash>=40200)) &&
@@ -269,7 +269,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'echo "${#a[@]}:(${a[*]})"' stdout='3:(A B C)'
 )
 (
-  function result { echo "$ret:${#arr[*]}:(${arr[*]})"; }
+  function result { ble/util/print "$ret:${#arr[*]}:(${arr[*]})"; }
   ble/test 'arr=()     ; ble/array#pop arr; result' stdout=':0:()'
   ble/test 'arr=(1)    ; ble/array#pop arr; result' stdout='1:0:()'
   ble/test 'arr=(1 2)  ; ble/array#pop arr; result' stdout='2:1:(1)'
@@ -279,7 +279,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
            stdout=' c c :2:( a a   b b )'
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=()
   ble/array#unshift a
   ble/test status stdout='0:()'
@@ -296,7 +296,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test status stdout='2:(A B)'
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=(); ble/array#reverse a
   ble/test status stdout='0:()'
   a=(1); ble/array#reverse a
@@ -311,7 +311,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test status stdout="9:(${b[*]})"
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=(); ble/array#insert-at a 0 A B C
   ble/test status stdout='3:(A B C)'
   a=(); ble/array#insert-at a 1 A B C
@@ -336,7 +336,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test status stdout='3:(x y z)'
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=(hello world hello world)
   ble/array#insert-after a hello 1 2 3
   ble/test status stdout='7:(hello 1 2 3 world hello world)'
@@ -348,7 +348,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test status stdout='4:(hello world hello world)'
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=(hello world this)
   ble/array#insert-before a this with check
   ble/test status stdout='5:(hello world with check this)'
@@ -357,7 +357,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test status stdout='3:(hello world this)'
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=(xxx yyy xxx yyy yyy xxx fdsa fdsa)
   ble/array#remove a xxx
   ble/test status stdout='5:(yyy yyy yyy fdsa fdsa)'
@@ -386,7 +386,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/array#last-index a check' ret=-1
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   a=()
   ble/test 'ble/array#remove-at a 0; status' stdout='0:()'
   ble/test 'ble/array#remove-at a 10; status' stdout='0:()'
@@ -400,6 +400,50 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/array#remove-at a 25; status' stdout="25:(${a1[*]})"
   ble/test 'ble/array#remove-at a 0; status' stdout="24:(${a2[*]})"
   ble/test 'ble/array#remove-at a 7; status' stdout="23:(${a3[*]})"
+)
+(
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
+  a=(); ble/test 'ble/array#map-prefix a hello; status' stdout='0:()'
+  a=(); ble/test 'ble/array#map-suffix a hello; status' stdout='0:()'
+  a=(); ble/test 'ble/array#map-prefix a ""; status' stdout='0:()'
+  a=(); ble/test 'ble/array#map-suffix a ""; status' stdout='0:()'
+  a=(''); ble/test 'ble/array#map-prefix a hello; status' stdout='1:(hello)'
+  a=(''); ble/test 'ble/array#map-suffix a hello; status' stdout='1:(hello)'
+  a=(''); ble/test 'ble/array#map-prefix a ""; status' stdout='1:()'
+  a=(''); ble/test 'ble/array#map-suffix a ""; status' stdout='1:()'
+  a=('' ''); ble/test 'ble/array#map-prefix a hello; status' stdout='2:(hello hello)'
+  a=('' ''); ble/test 'ble/array#map-suffix a hello; status' stdout='2:(hello hello)'
+  a=('' ''); ble/test 'ble/array#map-prefix a ""; status' stdout='2:( )'
+  a=('' ''); ble/test 'ble/array#map-suffix a ""; status' stdout='2:( )'
+  a=(ABC DEF); ble/test 'ble/array#map-prefix a hello; status' stdout='2:(helloABC helloDEF)'
+  a=(ABC DEF); ble/test 'ble/array#map-suffix a hello; status' stdout='2:(ABChello DEFhello)'
+  a=(ABC DEF); ble/test 'ble/array#map-prefix a ""; status' stdout='2:(ABC DEF)'
+  a=(ABC DEF); ble/test 'ble/array#map-suffix a ""; status' stdout='2:(ABC DEF)'
+  unset -v a; ble/test 'ble/array#map-prefix a hello; status' stdout='0:()'
+  unset -v a; ble/test 'ble/array#map-suffix a hello; status' stdout='0:()'
+  unset -v a; ble/test 'ble/array#map-prefix a ""; status' stdout='0:()'
+  unset -v a; ble/test 'ble/array#map-suffix a ""; status' stdout='0:()'
+  unset -v a; a=ABC; ble/test 'ble/array#map-prefix a hello; status' stdout='1:(helloABC)'
+  unset -v a; a=ABC; ble/test 'ble/array#map-suffix a hello; status' stdout='1:(ABChello)'
+  unset -v a; a=ABC; ble/test 'ble/array#map-prefix a ""; status' stdout='1:(ABC)'
+  unset -v a; a=ABC; ble/test 'ble/array#map-suffix a ""; status' stdout='1:(ABC)'
+)
+(
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
+  a=(1 2 3 4 5)
+  ble/test 'ble/array#fill-range a 2 4 x; status' stdout='5:(1 2 x x 5)'
+  a=(1 2 3 4 5)
+  ble/test 'ble/array#fill-range a 2 4 ""; status' stdout='5:(1 2   5)'
+  a=(1 2 3 4 5)
+  ble/test 'ble/array#fill-range a 2 3 x; status' stdout='5:(1 2 x 4 5)'
+  a=(1 2 3 4 5)
+  ble/test 'ble/array#fill-range a 2 3 ""; status' stdout='5:(1 2  4 5)'
+  a=(1 2 3 4 5)
+  ((_ble_bash>=40300)) && shopt -u compat42
+  ble/test 'ble/array#fill-range a 1 4 "A&B"; status' stdout='5:(1 A&B A&B A&B 5)'
+  a=(1 2 3 4 5)
+  ((_ble_bash>=40300)) && shopt -s compat42
+  ble/test 'ble/array#fill-range a 1 4 "A&B"; status' stdout='5:(1 A&B A&B A&B 5)'
 )
 (
   _ble_string_prototype='        '
@@ -462,7 +506,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/string#common-suffix abc xyz' ret=
 )
 (
-  function status { echo "${#a[@]}:(""${a[*]}"")"; }
+  function status { ble/util/print "${#a[@]}:(""${a[*]}"")"; }
   nl=$'\n'
   ble/test 'ble/string#split a , ""  ; status' stdout='1:()'
   ble/test 'ble/string#split a , "1"  ; status' stdout='1:(1)'
@@ -476,7 +520,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/string#split a " " "1'"$nl"'2'"$nl"'3"; status' stdout="1:(1${nl}2${nl}3)"
 )
 (
-  function status { echo "${#a[@]}:(${a[*]})"; }
+  function status { ble/util/print "${#a[@]}:(${a[*]})"; }
   nl=$'\n' ht=$'\t'
   ble/test 'ble/string#split-words a ""  ; status' stdout='0:()'
   ble/test 'ble/string#split-words a "1"  ; status' stdout='1:(1)'
@@ -489,7 +533,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/string#split-words a "  1'"$nl"'2'"$nl"'3  "; status' stdout='3:(1 2 3)'
 )
 (
-  function status { echo "${#a[@]}:(""${a[*]}"")"; }
+  function status { ble/util/print "${#a[@]}:(""${a[*]}"")"; }
   nl=$'\n' ht=$'\t'
   ble/test 'ble/string#split-lines a ""  ; status' stdout='1:()'
   ble/test 'ble/string#split-lines a "1"  ; status' stdout='1:(1)'
@@ -769,6 +813,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
     ble/test code:'ret=xyz:abc:xyz; '$cmd' ret abc' ret=xyz:xyz
     ble/test code:'ret=xyz:xyz:xyz; '$cmd' ret xyz' ret=
   done
+  export LC_ALL= LC_COLLATE=C 2>/dev/null # suppress locale error #D1440
   ble/test code:'ret=a; ble/path#remove ret \?' ret=a
   ble/test code:'ret=aa; ble/path#remove ret \?' ret=aa
   ble/test code:'ret=a:b; ble/path#remove ret \?' ret=a:b
@@ -785,6 +830,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test code:'ret=stdX:stdY:usrZ; ble/path#remove-glob ret "std[a-zX-Z]"' ret=usrZ
   ble/test code:'ret=stdX:usrZ:stdY; ble/path#remove-glob ret "std[a-zX-Z]"' ret=usrZ
   ble/test code:'ret=usrZ:stdX:stdY; ble/path#remove-glob ret "std[a-zX-Z]"' ret=usrZ
+  ble/test code:'ret=/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin; ble/path#remove-glob ret "/usr/local/*"' ret=/usr/bin:/usr/sbin
 )
 (
   ble/test code:'ret=; ble/path#append ret a' ret=a
@@ -898,107 +944,107 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   blehook/declare FOO
   ble/test 'blehook --color=never FOO' stdout='blehook FOO='
   ble/test 'blehook/has-hook FOO' exit=1
-  blehook FOO+='echo hello'
+  blehook FOO+='ble/util/print hello'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo hello'"
+           stdout="blehook FOO='ble/util/print hello'"
   ble/test 'blehook/has-hook FOO'
-  blehook FOO+='echo world'
+  blehook FOO+='ble/util/print world'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo hello'" \
-           stdout="blehook FOO+='echo world'"
+           stdout="blehook FOO='ble/util/print hello'" \
+           stdout="blehook FOO+='ble/util/print world'"
   ble/test 'blehook/has-hook FOO'
-  blehook FOO-='echo hello'
+  blehook FOO-='ble/util/print hello'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo world'"
+           stdout="blehook FOO='ble/util/print world'"
   ble/test 'blehook/has-hook FOO'
-  blehook FOO-='echo world'
+  blehook FOO-='ble/util/print world'
   ble/test 'blehook --color=never FOO' \
            stdout='blehook FOO='
   ble/test 'blehook/has-hook FOO' exit=1
-  blehook FOO+='echo hello'
-  blehook FOO+='echo world'
-  blehook FOO='echo empty'
+  blehook FOO+='ble/util/print hello'
+  blehook FOO+='ble/util/print world'
+  blehook FOO='ble/util/print empty'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo empty'"
+           stdout="blehook FOO='ble/util/print empty'"
   ble/test 'blehook/has-hook FOO'
-  blehook FOO+='echo hello'
-  blehook FOO+='echo world'
+  blehook FOO+='ble/util/print hello'
+  blehook FOO+='ble/util/print world'
   blehook FOO=
   ble/test 'blehook --color=never FOO' \
            stdout='blehook FOO='
   ble/test 'blehook/has-hook FOO' exit=1
-  blehook FOO+='echo hello'
-  blehook FOO+='echo world'
-  blehook FOO!='echo hello'
+  blehook FOO+='ble/util/print hello'
+  blehook FOO+='ble/util/print world'
+  blehook FOO!='ble/util/print hello'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo hello'${_ble_term_nl}blehook FOO+='echo world'"
-  blehook FOO-+='echo hello'
+           stdout="blehook FOO='ble/util/print hello'${_ble_term_nl}blehook FOO+='ble/util/print world'"
+  blehook FOO-+='ble/util/print hello'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo world'${_ble_term_nl}blehook FOO+='echo hello'"
-  blehook FOO+-='echo hello'
+           stdout="blehook FOO='ble/util/print world'${_ble_term_nl}blehook FOO+='ble/util/print hello'"
+  blehook FOO+-='ble/util/print hello'
   ble/test 'blehook --color=never FOO' \
-           stdout="blehook FOO='echo hello'${_ble_term_nl}blehook FOO+='echo world'"
+           stdout="blehook FOO='ble/util/print hello'${_ble_term_nl}blehook FOO+='ble/util/print world'"
   blehook FOO=
-  blehook FOO+='echo hello'
-  blehook FOO+='echo empty'
-  blehook FOO+='echo world'
+  blehook FOO+='ble/util/print hello'
+  blehook FOO+='ble/util/print empty'
+  blehook FOO+='ble/util/print world'
   ble/test 'blehook/invoke FOO' \
            stdout=hello \
            stdout=empty \
            stdout=world
-  blehook FOO='echo A$?'
-  blehook FOO+='echo B$?'
-  blehook FOO+='echo C$?'
+  blehook FOO='ble/util/print "A$?"'
+  blehook FOO+='ble/util/print "B$?"'
+  blehook FOO+='ble/util/print "C$?"'
   ble/test 'ble/util/setexit 123; blehook/invoke FOO' \
            stdout=A123 \
            stdout=B123 \
            stdout=C123
   blehook/declare bar_load
-  blehook bar_load='echo bar_load'
-  ble/test 'blehook/eval-after-load bar "echo yes"' stdout=
+  blehook bar_load='ble/util/print bar_load'
+  ble/test 'blehook/eval-after-load bar "ble/util/print yes"' stdout=
   ble/test 'blehook/invoke bar_load' \
            stdout=bar_load \
            stdout=yes
-  ble/test 'blehook/eval-after-load bar "echo next"' stdout=next
+  ble/test 'blehook/eval-after-load bar "ble/util/print next"' stdout=next
   function func { ret="[$1]"; }
   blehook FOO=func
   ble/test 'blehook/invoke FOO xQAHbcpMFyFyQ' ret='[xQAHbcpMFyFyQ]'
 )
 (
-  ble/builtin/trap 'echo TRAPEXIT1' 0
+  ble/builtin/trap 'ble/util/print TRAPEXIT1' 0
   ble/test 'ble/builtin/trap/invoke 0' stdout=TRAPEXIT1
   ble/test 'ble/builtin/trap/invoke EXIT' stdout=TRAPEXIT1
   ble/builtin/trap 0
   ble/test 'ble/builtin/trap/invoke 0' stdout=
-  ble/builtin/trap 'echo TRAPEXIT2' EXIT
+  ble/builtin/trap 'ble/util/print TRAPEXIT2' EXIT
   ble/test 'ble/builtin/trap/invoke 0' stdout=TRAPEXIT2
   ble/test 'ble/builtin/trap/invoke EXIT' stdout=TRAPEXIT2
   ble/builtin/trap EXIT
   ble/test 'ble/builtin/trap/invoke 0' stdout=
-  ble/builtin/trap 'echo TRAPHUP1' 1
+  ble/builtin/trap 'ble/util/print TRAPHUP1' 1
   ble/test 'ble/builtin/trap/invoke 1' stdout=TRAPHUP1
   ble/test 'ble/builtin/trap/invoke HUP' stdout=TRAPHUP1
   ble/test 'ble/builtin/trap/invoke SIGHUP' stdout=TRAPHUP1
   ble/builtin/trap 1
   ble/test 'ble/builtin/trap/invoke 1' stdout=
-  ble/builtin/trap 'echo TRAPHUP2' HUP
+  ble/builtin/trap 'ble/util/print TRAPHUP2' HUP
   ble/test 'ble/builtin/trap/invoke 1' stdout=TRAPHUP2
   ble/test 'ble/builtin/trap/invoke HUP' stdout=TRAPHUP2
   ble/test 'ble/builtin/trap/invoke SIGHUP' stdout=TRAPHUP2
   ble/builtin/trap HUP
   ble/test 'ble/builtin/trap/invoke HUP' stdout=
-  ble/builtin/trap 'echo TRAPHUP3' SIGHUP
+  ble/builtin/trap 'ble/util/print TRAPHUP3' SIGHUP
   ble/test 'ble/builtin/trap/invoke 1' stdout=TRAPHUP3
   ble/test 'ble/builtin/trap/invoke HUP' stdout=TRAPHUP3
   ble/test 'ble/builtin/trap/invoke SIGHUP' stdout=TRAPHUP3
   ble/builtin/trap SIGHUP
   ble/test 'ble/builtin/trap/invoke HUP' stdout=
   ble/builtin/trap/sig#new CUSTOM
-  ble/builtin/trap 'echo custom trap' CUSTOM
+  ble/builtin/trap 'ble/util/print "custom trap"' CUSTOM
   ble/test 'ble/builtin/trap/invoke CUSTOM' stdout='custom trap'
-  function ble/builtin/trap:CUSTOM { echo "__set_handler__ ($2) $1"; }
-  ble/test 'ble/builtin/trap "echo hello world" CUSTOM' \
-           stdout='__set_handler__ (CUSTOM) echo hello world'
+  function ble/builtin/trap:CUSTOM { ble/util/print "__set_handler__ ($2) $1"; }
+  ble/test 'ble/builtin/trap "ble/util/print \"hello world\"" CUSTOM' \
+           stdout='__set_handler__ (CUSTOM) ble/util/print "hello world"'
   ble/test 'ble/builtin/trap/invoke CUSTOM' stdout='hello world'
 )
 (
@@ -1009,7 +1055,7 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/util/readfile ret <(echo hello; echo -n world)' \
            ret=hello$'\n'world
   ble/test 'ble/util/readfile ret <(:)' ret=
-  function status { echo "${#a[*]}:(""${a[*]}"")"; }
+  function status { ble/util/print "${#a[*]}:(""${a[*]}"")"; }
   ble/test "ble/util/mapfile a < <(echo hello); status" stdout='1:(hello)'
   ble/test "ble/util/mapfile a < <(echo -n hello); status" stdout='1:(hello)'
   ble/test "ble/util/mapfile a < <(echo hello; echo world); status" stdout='2:(hello world)'
@@ -1025,10 +1071,10 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/util/assign ret "echo"' ret=
   ble/test 'ble/util/assign ret "echo hello"' ret=hello
   ble/test 'ble/util/assign ret "seq 5"' ret="1${nl}2${nl}3${nl}4${nl}5"
-  function f1 { echo stdout; echo stderr >&2; }
+  function f1 { ble/util/print stdout; ble/util/print stderr >&2; }
   function nested-assign {
     ble/util/assign err 'ble/util/assign out f1 2>&1'
-    echo "out=$out err=$err"
+    ble/util/print "out=$out err=$err"
   }
   ble/test nested-assign stdout='out=stdout err=stderr'
   ble/test 'ble/util/assign-array a :; status' stdout='0:()'
@@ -1063,14 +1109,16 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
       fi
     done
   done
+  a=(1 2 3)
+  ble/test 'ble/util/writearray --nlfix a; echo x' stdout:$'1\n2\n3\n\nx'
 )
 (
   var=variable
   alias ali=fun
-  function fun { echo yes "$*"; }
-  function ble/fun { echo yes "$*"; return 99; }
-  function ble/fun:type { echo yes "$*"; return 100; }
-  function ble/fun#meth { echo yes "$*"; return 101; }
+  function fun { ble/util/print "yes $*"; }
+  function ble/fun { ble/util/print "yes $*"; return 99; }
+  function ble/fun:type { ble/util/print "yes $*"; return 100; }
+  function ble/fun#meth { ble/util/print "yes $*"; return 101; }
   ble/test 'ble/is-function' exit=1
   ble/test 'ble/is-function ""' exit=1
   ble/test 'ble/is-function fun'
@@ -1086,9 +1134,9 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/is-function compgen' exit=1
   ble/test 'ble/is-function declare' exit=1
   ble/test 'ble/is-function mkfifo' exit=1
-  function compgen { :; }
-  function declare { :; }
-  function mkfifo { :; }
+  function compgen { return 0; }
+  function declare { return 0; }
+  function mkfifo { return 0; }
   ble/test 'ble/is-function compgen'
   ble/test 'ble/is-function declare'
   ble/test 'ble/is-function mkfifo'
@@ -1102,21 +1150,21 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
   ble/test 'ble/function#try ble/fun1#meth 1 2 3' stdout= exit=127
 )
 (
-  function f1 { echo original $*; }
+  function f1 { ble/util/print "original${*:+ $*}"; }
   ble/test f1 stdout='original'
-  ble/function#advice before f1 'echo pre'
+  ble/function#advice before f1 'ble/util/print pre'
   ble/test f1 stdout={pre,original}
-  ble/function#advice after f1 'echo post'
+  ble/function#advice after f1 'ble/util/print post'
   ble/test f1 stdout={pre,original,post}
-  ble/function#advice before f1 'echo A'
+  ble/function#advice before f1 'ble/util/print A'
   ble/test f1 stdout={A,original,post}
-  ble/function#advice after f1 'echo B'
+  ble/function#advice after f1 'ble/util/print B'
   ble/test f1 stdout={A,original,B}
-  ble/function#advice around f1 'echo [; ble/function#advice/do; echo ]'
+  ble/function#advice around f1 'ble/util/print [; ble/function#advice/do; ble/util/print ]'
   ble/test f1 stdout={A,[,original,],B}
   ble/function#advice around f1 '
     ADVICE_WORDS[1]=quick
-    echo [; ble/function#advice/do; echo ]
+    ble/util/print [; ble/function#advice/do; ble/util/print ]
     ADVICE_EXIT=99'
   ble/test f1 stdout={A,[,'original quick',],B} exit=99
   ble/function#advice remove f1
@@ -1171,10 +1219,10 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
 (
   shopt -s expand_aliases
   alias aaa=fun
-  function fun { :; }
-  function ble/fun { :; }
-  function ble/fun:type { :; }
-  function ble/fun#meth { :; }
+  function fun { return 0; }
+  function ble/fun { return 0; }
+  function ble/fun:type { return 0; }
+  function ble/fun#meth { return 0; }
   ble/test 'ble/util/type ret aaa' ret=alias
   ble/test 'ble/util/type ret fun' ret=function
   ble/test 'ble/util/type ret alias' ret=builtin
@@ -1207,19 +1255,19 @@ function is-global() (builtin readonly "$1"; ! local "$1" 2>/dev/null)
 )
 if ((_ble_bash>=40000)); then
   (
-    ble/test 'echo 1 | { sleep 0.01; ble/util/is-stdin-ready; }'
+    ble/test 'echo 1 | { sleep 0.01; ble/util/is-stdin-ready 0; }'
     [[ ${CI-} == true && ${GITHUB_ACTION-} && $OSTYPE == msys* ]] ||
-      ble/test 'sleep 0.01 | ble/util/is-stdin-ready' exit=1
-    ble/test 'ble/util/is-stdin-ready <<< a'
-    ble/test 'ble/util/is-stdin-ready <<< ""'
-    ble/test ': | { sleep 0.01; ble/util/is-stdin-ready; }'
-    ble/test 'ble/util/is-stdin-ready < /dev/null'
+      ble/test 'sleep 0.01 | ble/util/is-stdin-ready 0' exit=1
+    ble/test 'ble/util/is-stdin-ready 0 <<< a'
+    ble/test 'ble/util/is-stdin-ready 0 <<< ""'
+    ble/test ': | { sleep 0.01; ble/util/is-stdin-ready 0; }'
+    ble/test 'ble/util/is-stdin-ready 0 < /dev/null'
   )
 fi
 ble/test ble/util/is-running-in-subshell exit=1
 ( ble/test ble/util/is-running-in-subshell )
 (
-  ble/test/chdir
+  ble/test/chdir || exit
   function getpid {
     sh -c 'printf %s $PPID' >| a.txt
     ble/util/readfile ppid a.txt
@@ -1250,10 +1298,10 @@ ble/test ble/util/is-running-in-subshell exit=1
   ble/test 'ble/fd#is-open 9' exit=1
 )
 (
-  ble/test/chdir
+  ble/test/chdir || exit
   ble/fd#alloc fd '> a.txt'
-  echo hello >&"$fd"
-  echo world >&"$fd"
+  ble/util/print hello >&"$fd"
+  ble/util/print world >&"$fd"
   if ((_ble_bash/100!=301)); then
     ble/test 'ble/fd#close fd; echo test >&"$fd"' exit=1
     ble/test 'cat a.txt' stdout={hello,world}
@@ -1269,25 +1317,25 @@ ble/test ble/util/is-running-in-subshell exit=1
   xv6a=$'\x01' xv6b=a$'\x01'b
   xv7a=$'\x02' xv7b=a$'\x02'b
   xv8a=$'\x7F' xv8b=a$'\x7F'b
-  eval -- "$(
+  builtin eval -- "$(
     for name in v1 v{2..8}{a,b}; do
-      eval "$name=\$x$name"
+      builtin eval "$name=\$x$name"
     done
     ble/util/declare-print-definitions vn v1 v{2..8}{a,b} 2>/dev/null)"
   ble/test '[[ ! ${vn+set} ]]'
   for name in v1 v{2..8}{a,b}; do
     ble/test "declare -p $name x$name | cat -v >&2; [[ \$$name == \$x$name ]]"
   done
-  function status { eval 'ret="${#'$1'[*]}:(""${'$1'[*]}"")"'; }
+  function status { builtin eval 'ret="${#'$1'[*]}:(""${'$1'[*]}"")"'; }
   xa0=() sa0='0:()'
   xa1=('') sa1='1:()'
   for k in {2..8}; do
-    eval "xa$k=(); xa$k[0]=\"\$xv${k}a\"; xa$k[1]=\"\$xv${k}b\""
-    eval "sa$k=\"2:(\$xv${k}a \$xv${k}b)\""
+    builtin eval "xa$k=(); xa$k[0]=\"\$xv${k}a\"; xa$k[1]=\"\$xv${k}b\""
+    builtin eval "sa$k=\"2:(\$xv${k}a \$xv${k}b)\""
   done
-  eval -- "$(
+  builtin eval -- "$(
     for name in a0 a1 a{2..8}; do
-      eval "$name=(\"\${x$name[@]}\")"
+      builtin eval "$name=(\"\${x$name[@]}\")"
     done
     ble/util/declare-print-definitions a0 a1 a{2..8} 2>/dev/null)"
   for name in a0 a1 a{2..8}; do
@@ -1297,7 +1345,7 @@ ble/test ble/util/is-running-in-subshell exit=1
   done
 )
 (
-  function status { builtin eval 'echo "${#'$1'[*]}:(""${'$1'[*]}"")"'; }
+  function status { builtin eval 'ble/util/print "${#'$1'[*]}:(""${'$1'[*]}"")"'; }
   v1=123 v2=(1 2 3) v3=bbb v4=ccc
   function f2 {
     local v3=x v4=y
@@ -1358,15 +1406,31 @@ if ! [[ ${CI-} == true && ${GITHUB_ACTION-} ]]; then
 fi
 (
   time=0
-  ble/function#push ble/util/msleep '((time+=$1));echo $time'
-  ble/test "ble/util/conditional-sync 'sleep 10' '((time<1000))' 100" \
+  ble/function#push ble/util/msleep '((time+=$1));ble/util/print $time'
+  ble/test "ble/util/conditional-sync 'ble/bin/sleep 10' '((time<1000))' 100" \
            stdout={1..10}00
-  ble/test "ble/util/conditional-sync 'sleep 10' '((time<1000))' 100 progressive-weight" \
+  ble/test "ble/util/conditional-sync 'ble/bin/sleep 10' '((time<1000))' 100 progressive-weight" \
            stdout={1,3,7,15,31,63,{1..10}27}
+  ble/test "ble/util/conditional-sync 'ble/bin/sleep 10' 'true' 100 timeout=10" stdout=10 exit=142
+  ble/test "ble/util/conditional-sync 'echo unexpected' 'true' 100 timeout=0" stdout= exit=142
+  ble/bin/sleep 10 & pid1=$!
+  ble/test "ble/util/conditional-sync 'echo unexpected' 'true' 100 timeout=0:pid=$pid1" stdout= exit=142
+  ble/bin/sleep 10 & pid2=$!
+  ble/test "ble/util/conditional-sync 'echo unexpected' 'true' 100 timeout=-1:pid=$pid2" stdout= exit=142
+  set -m; ble/bin/sleep 10 & pid3=$!; set +m
+  ble/test "ble/util/conditional-sync 'echo unexpected' 'true' 100 timeout=0:pid=-$pid3" stdout= exit=142
+  if [[ $OSTYPE == cygwin* || $OSTYPE == msys* ]]; then
+    ble/bin/sleep 0.20
+  else
+    ble/bin/sleep 0.02
+  fi
+  ble/test 'kill -0 "$pid1"' exit=1
+  ble/test 'kill -0 "$pid2"' exit=1
+  ble/test 'kill -0 "$pid3"' exit=1
   ble/function#pop ble/util/msleep
 )
 (
-  function ble/test:ble/util/cat { { ble/util/cat; echo x; } | cat -v; }
+  function ble/test:ble/util/cat { { ble/util/cat; ble/util/print x; } | cat -v; }
   ble/test ":| ble/test:ble/util/cat"                       stdout=x
   ble/test "printf a | ble/test:ble/util/cat"               stdout=ax
   ble/test "printf '\0' | ble/test:ble/util/cat"            stdout=^@x
@@ -1390,6 +1454,7 @@ fi
   ble/test 'ble/util/pager <<< hello' stdout=hello
 )
 (
+  _ble_util_fd_tui_stderr=1 # ble/util/buffer.flush write outputs to this fd.
   ble/util/buffer.clear
   ble/test 'ble/util/buffer.flush' stdout=
   ble/util/buffer hello
@@ -1445,6 +1510,46 @@ fi
   ble/dirty-range#update --prefix=u 10 13 11
   ble/dirty-range#update --prefix=u 3 7 8
   ble/test 'echo "$ubeg:$uend:$uend0"' stdout=3:12:11
+)
+(
+  ble/function#try ble/util/idle.clear
+  ble/util/buffer.clear
+  blehook idle_after_task=
+  ble/function#push ble/util/idle/IS_IDLE '((1))'
+  ble/test/chdir || exit
+  ble/util/print 'ble/util/print FILE1' >| FILE1.txt
+  ble/util/print 'ble/util/print FILE2' >| FILE2.txt
+  ble/util/print 'ble/util/print FILE3' >| FILE3.txt
+  (
+    ble-import FILE1.txt -C 'ble/util/print loaded1'
+    ble-import FILE1.txt -C 'ble/util/print loaded2'
+    ble-import FILE1.txt -C 'ble/util/print loaded3' -C 'ble/util/print loaded4'
+    ble-import FILE1.txt FILE2.txt -C 'ble/util/print both1' -C 'ble/util/print both2'
+    (
+      if ble/is-function ble/util/idle.push; then
+        ble/test 'ble/util/idle.do' stdout=
+      fi
+      ble/test 'ble-import FILE1.txt' stdout=$'FILE1\nloaded1\nloaded2\nloaded3\nloaded4'
+      ble/test 'ble-import FILE2.txt' stdout=$'FILE2\nboth1\nboth2'
+    )
+    (
+      ble/test 'ble-import FILE2.txt' stdout='FILE2'
+      ble/test 'ble-import FILE1.txt' stdout=$'FILE1\nloaded1\nloaded2\nloaded3\nloaded4\nboth1\nboth2'
+    )
+  )
+  (
+    ble-import FILE1.txt FILE2.txt FILE3.txt -C 'ble/util/print triple'
+    ble/test 'ble-import FILE2.txt' stdout='FILE2'
+    ble/test 'ble-import FILE3.txt' stdout='FILE3'
+    ble/test 'ble-import FILE1.txt' stdout=$'FILE1\ntriple'
+  )
+  if ble/is-function ble/util/idle.push; then
+    (
+      ble-import FILE1.txt FILE2.txt -dC 'ble/util/print both'
+      ble/test 'ble/util/idle.do' stdout=$'FILE1\nFILE2\nboth'
+    )
+  fi
+  ble/test/rmdir
 )
 (
   ble/test $'ble/util/s2c "\n"' ret=10
@@ -1505,7 +1610,7 @@ fi
   ble/test 'ble/util/chars2s 12354' ret=あ
 )
 (
-  check1() {
+  function check1 {
     local char=$1 keyseq=$2
     ble/test "ble/util/c2keyseq $char" ret="$keyseq"
     ble/test "ble/util/chars2keyseq $char" ret="$keyseq"
@@ -1513,16 +1618,16 @@ fi
     ble/test "ble/util/chars2keyseq 98 $char 99" ret="b${keyseq}c"
     ble/test "ble/util/keyseq2chars 'b${keyseq}c'; ret=\"\${ret[*]}\"" ret="98 ${3:-$char} 99"
   }
-  check1 '7'   '\a' 
-  check1 '8'   '\b' 
-  check1 '9'   '\t' 
-  check1 '10'  '\n' 
-  check1 '11'  '\v' 
-  check1 '12'  '\f' 
-  check1 '13'  '\r' 
-  check1 '27'  '\e' 
+  check1 '7'   '\a'
+  check1 '8'   '\b'
+  check1 '9'   '\t'
+  check1 '10'  '\n'
+  check1 '11'  '\v'
+  check1 '12'  '\f'
+  check1 '13'  '\r'
+  check1 '27'  '\e'
   check1 '127' '\d'
-  check1 '92'  '\\'   
+  check1 '92'  '\\'
   check1 '28'  '\x1c' # workaround bashbug \C-\, \C-\\
   check1 '156' '\x9c' # workaround bashbug \C-\, \C-\\
   check1 '0'   '\C-@'
@@ -1575,7 +1680,8 @@ fi
   ble/test 'ble/encoding:C/c2b 2048; pack' ret=0
 )
 (
-  clear-locale() { LC_ALL= LANG= LC_CTYPE=; }
+  function clear-locale { LC_ALL= LANG= LC_CTYPE=; }
+  ble/function#push ble/util/.test-utf8-locale 'return 0'
   for lang in {C,en_US,ja{_JP,}}.{UTF-8,utf8} ja_JP.{utf8,UTF-8}@cjk{wide,narrow,single}; do
     clear-locale
     ble/test "LANG=$lang; ble/util/is-unicode-output"
@@ -1592,5 +1698,6 @@ fi
     clear-locale
     ble/test "LC_CTYPE=C LANG=C LC_ALL=$lang; ble/util/is-unicode-output" exit=1
   done
+  ble/function#pop ble/util/.test-utf8-locale
 )
 ble/test/end-section

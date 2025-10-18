@@ -7,7 +7,7 @@
 # "akinomyoga/ble.sh".
 #
 # Source: /lib/vim-arpeggio.sh
-source "$_ble_base/keymap/vi.sh"
+ble-import keymap.vi
 bleopt/declare -v vim_arpeggio_timeoutlen 40
 function ble/lib/vim-arpeggio.sh/bind/.usage {
   ble/util/print "usage: ble/lib/vim-arpeggio.sh/bind [-m KEYMAP] -[fxcs@] KEYS COMMAND"
