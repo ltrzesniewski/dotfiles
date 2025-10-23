@@ -38,6 +38,7 @@ if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_pro
 
 Install-WinGet "PowerShell" "Microsoft.PowerShell"
 Install-WinGet "OhMyPosh" "JanDeDobbeleer.OhMyPosh"
+Install-WinGet "Git" "Git.Git"
 Install-WinGet "fzf" "fzf"
 Install-WinGet "jq" "jqlang.jq"
 
