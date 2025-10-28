@@ -37,6 +37,15 @@ function fdf {
     fd --type=f --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
 
+function Update-Dotfiles {
+    try {
+        Push-Location -Path "$PSScriptRoot" && git pull -r && ./Install.ps1
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 # Aliases
 
 Set-Alias ll Get-ChildItem
