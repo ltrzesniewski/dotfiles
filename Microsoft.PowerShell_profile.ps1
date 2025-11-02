@@ -8,6 +8,10 @@ if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAc
     atuin init powershell | Out-String | Invoke-Expression
 }
 
+if (Get-Command dotnet -ErrorAction Ignore) {
+    dotnet completions script pwsh | Out-String | Invoke-Expression -ErrorAction Ignore
+}
+
 if (Get-Command kubectl -ErrorAction Ignore) {
     kubectl completion powershell | Out-String | Invoke-Expression
 }
@@ -19,14 +23,6 @@ if (Get-Command rg -ErrorAction Ignore) {
 
 Import-Module -Name Terminal-Icons -ErrorAction Ignore
 
-# PowerShell parameter completion shim for the dotnet CLI
-Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-    param($commandName, $wordToComplete, $cursorPosition)
-    dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
-        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-    }
-}
-
 # Custom functions
 
 function Remove-BinObj {
@@ -37,13 +33,18 @@ function fdf {
     fd --type=f --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
 
-function Update-Dotfiles {
-    try {
-        Push-Location -Path "$PSScriptRoot" && git pull -r && ./Install.ps1
-    }
-    finally {
-        Pop-Location
-    }
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    Invoke-Expression '
+        function Update-Dotfiles {
+            try {
+                Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
+                Push-Location -Path "$PSScriptRoot" && git pull -r && ./Install.ps1
+            }
+            finally {
+                Pop-Location
+            }
+        }
+    '
 }
 
 # Aliases

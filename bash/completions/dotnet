@@ -1,0 +1,1 @@
+source <(dotnet completions script bash)
