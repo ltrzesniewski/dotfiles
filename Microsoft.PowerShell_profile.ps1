@@ -33,20 +33,6 @@ function fdf {
     fd --type=f --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
 
-if ($PSVersionTable.PSVersion.Major -ge 7) {
-    Invoke-Expression '
-        function Update-Dotfiles {
-            try {
-                Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
-                Push-Location -Path "$PSScriptRoot" && git pull -r && ./Install.ps1
-            }
-            finally {
-                Pop-Location
-            }
-        }
-    '
-}
-
 # Aliases
 
 Set-Alias ll Get-ChildItem
@@ -55,3 +41,8 @@ Set-Alias ll Get-ChildItem
 
 Set-PSReadLineKeyHandler -Chord "Ctrl+UpArrow" -Function PreviousHistory
 Set-PSReadLineKeyHandler -Chord "Ctrl+DownArrow" -Function NextHistory
+
+# Version-specific profile
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    . $PSScriptRoot/Microsoft.PowerShell_profile.V7.ps1
+}
