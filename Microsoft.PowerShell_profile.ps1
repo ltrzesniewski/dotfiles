@@ -9,7 +9,17 @@ if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAc
 }
 
 if (Get-Command dotnet -ErrorAction Ignore) {
-    dotnet completions script pwsh | Out-String | Invoke-Expression -ErrorAction Ignore
+    if ([int]($(dotnet --version) -replace '^(\d+)\..+', '$1') -ge 10) {
+        dotnet completions script pwsh | Out-String | Invoke-Expression -ErrorAction Ignore
+    }
+    else {
+        Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
+            param($wordToComplete, $commandAst, $cursorPosition)
+            dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
+        }
+    }
 }
 
 if (Get-Command kubectl -ErrorAction Ignore) {
