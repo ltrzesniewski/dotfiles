@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
-  "version": 3,
+  "version": 4,
   "console_title_template": "{{ if .Root }}\u26a1 {{ end }}{{ .Folder }}{{ if .Segments.Session.SSHSession }}@{{ .HostName }}{{ end }}",
   "final_space": true,
   "pwd": "osc99",
@@ -38,7 +38,7 @@
           "powerline_symbol": "\ue0b0",
           "foreground": "p:text",
           "background": "p:light",
-          "properties": {
+          "options": {
             "style": "full"
           },
           "template": " \uf07c {{ if .Segments.Session.SSHSession }}{{ .Path }}{{ else }}{{ path .Path .Location }}{{ end}} "
@@ -50,7 +50,7 @@
           "trailing_diamond": "\ue0b0",
           "foreground": "p:text",
           "background": "p:mid",
-          "properties": {
+          "options": {
             "branch_icon": "\ue725"
           },
           "template": " {{ regexReplaceAll \"^(.)(.*)\" .HEAD \"$1 $2\" }} "
@@ -74,7 +74,7 @@
           "style": "plain",
           "foreground": "p:mid",
           "background": "transparent",
-          "properties": {
+          "options": {
             "threshold": 500,
             "style": "austin"
           },
