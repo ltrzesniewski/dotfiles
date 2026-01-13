@@ -42,7 +42,7 @@ command -v rustup &> /dev/null && rustup update
 
 if command -v cargo &> /dev/null; then
     startInstall atuin
-    cargo install --locked --git https://github.com/atuinsh/atuin.git
+    cargo install --locked atuin
 
     startInstall bat
     cargo install --locked bat
