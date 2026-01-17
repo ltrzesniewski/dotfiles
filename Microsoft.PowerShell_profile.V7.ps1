@@ -8,3 +8,7 @@ function Update-Dotfiles {
         Pop-Location
     }
 }
+
+function cdr {
+    Set-Location (git rev-parse --show-toplevel || Get-Location)
+}

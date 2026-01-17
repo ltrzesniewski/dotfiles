@@ -1,6 +1,7 @@
 
 alias ll='ls -alF'
 alias rm-binobj='find -type d \( -name bin -o -name obj \) -exec rm -r {} +'
+alias cdr='cd "$(git rev-parse --show-toplevel)"'
 
 test -f ~/.cargo/env && source ~/.cargo/env
 
