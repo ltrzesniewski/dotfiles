@@ -55,7 +55,7 @@ if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
-    Install-App "atuin" { cargo install --locked atuin }
+    Install-App "atuin" { cargo install --locked atuin --git https://github.com/atuinsh/atuin.git }
     Install-App "bat" { cargo install --locked bat }
     Install-App "fd" { cargo install --locked fd-find }
     Install-App "ripgrep" { cargo install --locked ripgrep --features pcre2 }
