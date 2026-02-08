@@ -233,8 +233,23 @@ command_chaining = true
 ]
 
 "tab" = "return-selection"
-
 "enter" = "accept"
+
+"ctrl-i" = "toggle-tab"
+"ctrl-l" = "clear-line"
+
+"alt-delete" = "delete"
+"shift-delete" = "delete"
+
+"ctrl-home" = "scroll-to-top"
+"ctrl-end" = "scroll-to-bottom"
+
+[keymap.inspector]
+"ctrl-i" = "toggle-tab"
+
+"alt-delete" = "delete"
+"shift-delete" = "delete"
+
 
 [sync]
 # Enable sync v2 by default
