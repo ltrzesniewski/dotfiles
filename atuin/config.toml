@@ -235,6 +235,9 @@ command_chaining = true
 "tab" = "return-selection"
 "enter" = "accept"
 
+"ctrl-q" = "return-query"
+"ctrl-C" = "copy"
+
 "ctrl-i" = "toggle-tab"
 "ctrl-l" = "clear-line"
 
@@ -243,6 +246,12 @@ command_chaining = true
 
 "ctrl-home" = "scroll-to-top"
 "ctrl-end" = "scroll-to-bottom"
+
+"ctrl-b" = "switch-context"
+"ctrl-n" = [
+    { when = "!has-context", action = "switch-context" },
+    { action = "clear-context" }
+]
 
 [keymap.inspector]
 "ctrl-i" = "toggle-tab"
@@ -310,3 +319,6 @@ filters = [ "global", "session", "workspace", "directory" ]
 
 [dotfiles]
 enabled = true
+
+[ui]
+columns = ["duration", "time", "directory", "command"]
