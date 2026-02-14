@@ -241,8 +241,10 @@ command_chaining = true
 "ctrl-i" = "toggle-tab"
 "ctrl-l" = "clear-line"
 
-"alt-delete" = "delete"
-"shift-delete" = "delete"
+"ctrl-s" = "cycle-search-mode"
+"ctrl-f" = "cycle-filter-mode"
+
+"ctrl-shift-delete" = "delete"
 
 "ctrl-home" = "scroll-to-top"
 "ctrl-end" = "scroll-to-bottom"
@@ -255,10 +257,6 @@ command_chaining = true
 
 [keymap.inspector]
 "ctrl-i" = "toggle-tab"
-
-"alt-delete" = "delete"
-"shift-delete" = "delete"
-
 
 [sync]
 # Enable sync v2 by default
