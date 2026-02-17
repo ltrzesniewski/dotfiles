@@ -1,0 +1,20 @@
+[core]
+	longpaths = true
+	editor = \"C:/Program Files/GitExtensions/GitExtensions.exe\" fileeditor
+
+[credential]
+	helper = wincred
+
+[diff]
+	guitool = winmerge
+
+[merge]
+	guitool = tortoisemerge
+
+[difftool "winmerge"]
+	path = C:/Program Files/WinMerge/WinMergeU.exe
+	cmd = \"C:/Program Files/WinMerge/WinMergeU.exe\" -e -u \"$LOCAL\" \"$REMOTE\"
+
+[mergetool "tortoisemerge"]
+	path = C:/Program Files/TortoiseGit/bin/TortoiseGitMerge.exe
+	cmd = \"C:/Program Files/TortoiseGit/bin/TortoiseGitMerge.exe\" -base:\"$BASE\" -mine:\"$LOCAL\" -theirs:\"$REMOTE\" -merged:\"$MERGED\"

@@ -24,7 +24,7 @@ Function Install-WinGet {
     Install-App $AppName { winget install --source winget --silent --exact $PackageName } -ValidExitCodes @(0x8A15002B)
 }
 
-# Add profile script
+# Add profile script and other one-time stuff
 
 if (!(Test-Path -Path $PROFILE)) {
     New-Item -ItemType File -Path $PROFILE -Force | Out-Null
@@ -32,6 +32,16 @@ if (!(Test-Path -Path $PROFILE)) {
 
 if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_profile.ps1" -Quiet)) {
     Add-Content -Path $PROFILE -Value ". ~/dotfiles/Microsoft.PowerShell_profile.ps1"
+}
+
+if (Get-Command "git" -ErrorAction SilentlyContinue) {
+    $gitcfg = git config list --global
+    if ($gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig') {
+        git config set --global --append include.path '~/dotfiles/.gitconfig'
+    }
+    if ($gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig-windows') {
+        git config set --global --append include.path '~/dotfiles/.gitconfig-windows'
+    }
 }
 
 # Install WinGet apps

@@ -13,6 +13,10 @@ function startInstall() {
 grep -qF '~/dotfiles/.bashrc' ~/.bashrc || echo 'source ~/dotfiles/.bashrc' >> ~/.bashrc
 ln -sf ~/dotfiles/.inputrc ~/.inputrc
 
+if command -v git &> /dev/null; then
+    git config --get-all --global include.path | grep -qF '~/dotfiles/.gitconfig' || git config --add --global include.path '~/dotfiles/.gitconfig'
+fi
+
 # Install oh-py-posh
 
 startInstall OhMyPosh

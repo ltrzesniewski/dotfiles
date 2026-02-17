@@ -1,0 +1,25 @@
+[core]
+	pager = delta
+
+[fetch]
+	prune = true
+
+[pull]
+	rebase = true
+
+[rebase]
+	autoStash = false
+	autosquash = false
+	updateRefs = false
+
+[interactive]
+	diffFilter = delta --color-only
+
+[merge]
+	# conflictStyle = zdiff3
+
+[delta]
+	navigate = true
+	side-by-side = true
+	hyperlinks = true
+	hyperlinks-file-link-format = vscode://file/{path}:{line}
