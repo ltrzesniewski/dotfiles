@@ -47,6 +47,9 @@ if command -v cargo &> /dev/null; then
     startInstall bat
     cargo install --locked bat
 
+    startInstall delta
+    cargo install --locked git-delta
+
     startInstall fd
     cargo install --locked fd-find
 
