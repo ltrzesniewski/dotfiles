@@ -12,14 +12,30 @@
 	autosquash = false
 	updateRefs = false
 
+[alias]
+	mylog = log --author='Lucas Trzesniewski' --all --date-order --format='%C(yellow)%h  %as%Creset  %s'
+
+[format]
+	pretty = simple
+
+[pretty]
+	simple = %C(yellow)%h  %as  %<(25)%an%Creset  %s
+
 [interactive]
 	diffFilter = delta --color-only
 
 [merge]
 	# conflictStyle = zdiff3
 
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
 [delta]
 	navigate = true
 	side-by-side = true
 	hyperlinks = true
-	hyperlinks-file-link-format = vscode://file/{path}:{line}
+	hyperlinks-file-link-format = "vscode://file/{path}:{line}"
+	hunk-header-style = omit
