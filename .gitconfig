@@ -13,13 +13,13 @@
 	updateRefs = false
 
 [alias]
-	mylog = log --author='Lucas Trzesniewski' --all --date-order --format='%C(yellow)%h  %as%Creset  %s'
+	mylog = "log --author='Lucas Trzesniewski' --all --date-order --format='%C(#6F4E37)%h  %C(#A67B5B)%as%C(reset)  %s'"
 
 [format]
 	pretty = simple
 
 [pretty]
-	simple = %C(yellow)%h  %as  %<(25)%an%Creset  %s
+	simple = "%C(#6F4E37)%h  %C(#A67B5B)%as  %<(25)%C(#ECB176)%an%C(reset)  %s"
 
 [interactive]
 	diffFilter = delta --color-only
