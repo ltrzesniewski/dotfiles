@@ -31,6 +31,8 @@ if (Get-Command rg -ErrorAction Ignore) {
     rg --generate complete-powershell | Out-String | Invoke-Expression
 }
 
+$env:BAT_CONFIG_DIR = "$PSScriptRoot/bat"
+
 Import-Module -Name Terminal-Icons -ErrorAction Ignore
 
 # Custom functions

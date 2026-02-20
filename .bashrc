@@ -19,6 +19,7 @@ command -v rg &> /dev/null && source <(rg --generate complete-bash)
 export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
+export BAT_CONFIG_DIR=~/dotfiles/bat
 
 source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
