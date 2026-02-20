@@ -47,6 +47,10 @@ function fdh {
     fd --hyperlink=auto $args
 }
 
+function rgd {
+    rg --json $args | delta
+}
+
 # Aliases
 
 Set-Alias ll Get-ChildItem

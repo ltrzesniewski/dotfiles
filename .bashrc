@@ -30,3 +30,7 @@ fdf() {
 fdh() {
     fd --hyperlink=auto "$@"
 }
+
+rgd() {
+    rg --json "$@" | delta
+}
