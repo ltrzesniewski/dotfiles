@@ -25,7 +25,7 @@ source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 
 fdf() {
-    fd --type=f --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
+    fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
 
 fdh() {
