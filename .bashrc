@@ -32,6 +32,14 @@ fdh() {
     fd --hyperlink=auto "$@"
 }
 
+rgr() {
+    rg --no-heading --no-filename --no-line-number "$@"
+}
+
 rgd() {
     rg --json "$@" | delta
+}
+
+cdf() {
+    cd "$(fd --type=d --color=always "${@:-.}" "$(git rev-parse --show-toplevel 2> /dev/null || pwd)" | fzf --ansi --reverse --scheme=path || pwd)"
 }

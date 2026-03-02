@@ -49,6 +49,10 @@ function fdh {
     fd --hyperlink=auto $args
 }
 
+function rgr {
+    rg --no-heading --no-filename --no-line-number $args
+}
+
 function rgd {
     rg --json $args | delta
 }

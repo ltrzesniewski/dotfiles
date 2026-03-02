@@ -12,3 +12,7 @@ function Update-Dotfiles {
 function cdr {
     Set-Location (git rev-parse --show-toplevel || Get-Location)
 }
+
+function cdf {
+    Set-Location (fd --type=d --color=always ($args ? $args : '.') (git rev-parse --show-toplevel 2> $null || (Get-Location).Path).Replace('/', '\') | fzf --ansi --reverse --style=full --scheme=path || Get-Location)
+}
