@@ -41,19 +41,19 @@ function Remove-BinObj {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
 
-function fdf {
+function fdf { # fd find
     fd --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
 
-function fdh {
+function fdh { # fd hyperlink
     fd --hyperlink=auto $args
 }
 
-function rgr {
+function rgr { # rg raw
     rg --no-heading --no-filename --no-line-number $args
 }
 
-function rgd {
+function rgd { # rg delta
     rg --json $args | delta
 }
 

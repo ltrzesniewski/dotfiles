@@ -1,7 +1,5 @@
 
 alias ll='ls -alF'
-alias rm-binobj='find -type d \( -name bin -o -name obj \) -exec rm -r {} +'
-alias cdr='cd "$(git rev-parse --show-toplevel)"'
 
 test -f ~/.cargo/env && source ~/.cargo/env
 
@@ -24,6 +22,10 @@ export BAT_CONFIG_DIR=~/dotfiles/bat
 source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 
+rm_binobj() {
+    find -type d \( -name bin -o -name obj \) -exec rm -r {} +
+}
+
 fdf() {
     fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
 }
@@ -38,6 +40,10 @@ rgr() {
 
 rgd() {
     rg --json "$@" | delta
+}
+
+cdr() {
+    cd "$(git rev-parse --show-toplevel 2> /dev/null || pwd)"
 }
 
 cdf() {
