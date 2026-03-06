@@ -14,6 +14,7 @@
 
 [alias]
 	mylog = "log --author='Lucas Trzesniewski' --all --date-order --format='%C(#6F4E37)%h  %C(#A67B5B)%as%C(reset)  %s'"
+	ck = "!f() { git fetch origin && git checkout -B $1 origin/$1; }; f"
 
 [format]
 	pretty = simple
