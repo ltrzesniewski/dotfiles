@@ -12,6 +12,8 @@ param(
 
 begin {
     $script:buildResultSeen = $false
+    $script:previousProject = $null
+
     Write-Output "`e[0;3mProcessing...`e[0m"
 }
 
@@ -55,8 +57,8 @@ process {
 (?<code> [A-Z0-9]+ )
 : [ ]
 (?<message> .+? )
-(?<project>
-    [ ] \[ .+? \]
+(?:
+    [ ] \[ (?<project> .+? ) \]
 )?
 $
 '@) {
@@ -76,10 +78,24 @@ $
 
         $typeColor = if ($type -eq 'error') { "91" } else { "93" } # Red/Yellow
 
-        Write-Output "`e[0m${filePath}`e[0;1;97m${hyperlink}`e[0;2m${location}: `e[0;${typeColor}m${type} ${code}`e[0m: ${message}`e[0;2m${project}`e[0m"
+        if ($project -ne $script:previousProject) {
+            if ($script:previousProject) {
+                Write-Output "" # Add spacing between projects
+            }
+
+            Write-Output "`e[0;1;97mProject:`e[0m $($project ? $project : '(none)')`e[0m"
+            $script:previousProject = $project
+        }
+
+        Write-Output "`e[0m${filePath}`e[0;1;97m${hyperlink}`e[0;2m${location}: `e[0;${typeColor}m${type} ${code}`e[0m: ${message}`e[0m"
     }
     else {
+        if ($InputLine -match '^[ ]{4}[0-9]+ Warning\(s\)$') {
+            Write-Output ""
+        }
+
         Write-Output $InputLine
+        $script:previousProject = $null
     }
 }
 
