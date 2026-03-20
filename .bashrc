@@ -27,7 +27,8 @@ rm_binobj() {
 }
 
 fdf() {
-    fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
+    fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m)
+    echo "$fdf"
 }
 
 fdh() {
