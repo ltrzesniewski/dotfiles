@@ -20,7 +20,7 @@
 	pretty = simple
 
 [pretty]
-	simple = "%C(#6F4E37)%h  %C(#A67B5B)%as  %<(25)%C(#ECB176)%an%C(reset)  %s"
+	simple = "%C(#6F4E37)%h  %C(#A67B5B)%as  %<(20,trunc)%C(#ECB176)%an%C(reset)  %<(60,trunc)%s %C(#FED8B1)%d"
 
 [interactive]
 	diffFilter = delta --color-only

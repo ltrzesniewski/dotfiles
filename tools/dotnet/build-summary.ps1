@@ -42,12 +42,8 @@ process {
 
     if (-not $script:hasBuildResult) {
         # Check if this line is the build success of a project
-        if ($inputLine -match '^  (?<project>[\w-.]+) -> ') {
-            $project = $matches['project']
-            if (!$Short) {
-                Write-Output "${reset}  ✅ ${project}"
-            }
-            return
+        if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
+            Write-Output "${reset}  ✅ $($matches['project'])"
         }
 
         # Check if this line contains the build result message
@@ -65,7 +61,7 @@ process {
             return
         }
 
-        # Hack Write-Progress to show the last log line
+        # Hack the progress bar to show the last log line
         Write-Progress -Activity 'Build' -Status "`e[2K`r${reset}  $($inputLine.Trim())"
         return
     }
@@ -83,7 +79,7 @@ process {
 [ ]? : [ ]
 (?<type>error|warning)
 [ ]
-(?<code> [A-Z0-9]+ )
+(?<code> \w+ )
 : [ ]
 (?<message> .+? )
 (?:

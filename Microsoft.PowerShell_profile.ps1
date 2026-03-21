@@ -42,7 +42,7 @@ function Remove-BinObj {
 }
 
 function fdf { # fd find
-    $global:fdf = fd --strip-cwd-prefix --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
+    $global:fdf = fd --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
     $global:fdf
 }
 
