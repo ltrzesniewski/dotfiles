@@ -1,5 +1,5 @@
 #
-# Pipeline which processes the output of a dotnet build command and outputs only the summary,
+# Pipeline which processes the output of a "dotnet build" command and outputs only the summary,
 # including hyperlinks for errors and warnings that open in VS Code.
 #
 # Helps with large refactorings.
@@ -11,25 +11,44 @@ param(
 )
 
 begin {
-    $script:buildResultSeen = $false
-    $script:previousProject = $null
+    $hasBuildResult = $false
+    $previousProject = $null
 
-    Write-Output "`e[0;3mProcessing...`e[0m"
+    $reset = "`e[0m"
+    $dim = "`e[0;2m"
+
+    function Get-Uri {
+        param (
+            [string]$fullPath,
+            [string]$line,
+            [string]$column
+        )
+        $uri = "vscode://file/$($fullPath.Replace('\', '/'))"
+        $uri += $line ? ":$line" : ""
+        $uri += $line -and $column ? ":$column" : ""
+        $uri
+    }
+
+    function Get-Hyperlink {
+        param (
+            [string]$uri,
+            [string]$text
+        )
+        "`e]8;;${uri}`e\${text}`e]8;;`e\" # OSC 8 hyperlink
+    }
+
+    Write-Output "`e[0;1;3;94mProcessing...${reset}" # Bold italic bright blue
 }
 
 process {
     # Check if this line contains the build result message
-    if (-not $script:buildResultSeen -and $InputLine -match '^Build (?<result>succeeded|FAILED)\.') {
-        $script:buildResultSeen = $true
+    if (-not $hasBuildResult -and $InputLine -match '^Build (?<result>succeeded|FAILED)\.') {
+        $hasBuildResult = $true
 
-        # Format with bold and color based on result
-        $result = $matches['result']
-        $coloredLine = if ($result -eq 'succeeded') {
-            "`e[0;1;92m$InputLine`e[0m" # Bold bright green
-        } elseif ($result -eq 'FAILED') {
-            "`e[0;1;91m$InputLine`e[0m" # Bold bright red
-        } else {
-            $InputLine
+        $coloredLine = switch ($matches['result']) {
+            'succeeded' { "`e[0;1;92m${InputLine}${reset}" } # Bold bright green
+            'FAILED' { "`e[0;1;91m${InputLine}${reset}" } # Bold bright red
+            default { $InputLine }
         }
 
         Write-Output "`e[1A`e[2K" # Clear previous line
@@ -37,21 +56,22 @@ process {
         return
     }
 
-    # Skip all lines until we see the build result message
-    if (-not $script:buildResultSeen) {
+    # Skip all lines until the build result message
+    if (-not $hasBuildResult) {
         return
     }
 
-    # Pattern to match file paths in dotnet build errors
-    # Matches: path\to\file.cs(line,column): error/warning CS1234: Message
+    # Matches:
+    # - C:\path\to\file.cs(line,column): error CS1234: Message [C:\path\to\project.csproj::TargetFramework=net10.0]
+    # - C:\path\to\project.csproj : warning NU1234: Message [C:\path\to\solution.sln]
     if ($InputLine -match @'
 (?x) ^
 (?<fullPath>
     (?<filePath> .+? [\\/] )
     (?<fileName> [^\\/:]+? )
 )
-(?<location> \( (?<line>[0-9]+),(?<column>[0-9]+) \) )
-: [ ]
+(?<location> \( (?<line>[0-9]+) (?: , (?<column>[0-9]+) )? \) )?
+[ ]? : [ ]
 (?<type>error|warning)
 [ ]
 (?<code> [A-Z0-9]+ )
@@ -73,21 +93,50 @@ $
         $message = $matches['message']
         $project = $matches['project']
 
-        $vscodeUri = "vscode://file/$($fullPath.Replace('\', '/')):${line}:${column}"
-        $hyperlink = "`e]8;;${vscodeUri}`e\${fileName}`e]8;;`e\"
-
-        $typeColor = if ($type -eq 'error') { "91" } else { "93" } # Red/Yellow
-
-        if ($project -ne $script:previousProject) {
-            if ($script:previousProject) {
+        if ($project -ne $previousProject) {
+            if ($previousProject) {
                 Write-Output "" # Add spacing between projects
             }
 
-            Write-Output "`e[0;1;97mProject:`e[0m $($project ? $project : '(none)')`e[0m"
-            $script:previousProject = $project
+            $projectHeader = "`e[0;36m" # Cyan
+
+            if ($project -match @'
+(?x) ^
+(?<projectFullPath>
+    (?<projectPath> .+? [\\/] )
+    (?<projectName> [^\\/:]+? )
+)
+(?<projectDetails> :: .+? )?
+$
+'@) {
+                $projectFullPath = $matches['projectFullPath']
+                $projectPath = $matches['projectPath']
+                $projectName = $matches['projectName']
+                $projectDetails = $matches['projectDetails']
+
+                $projectHeader += Get-Hyperlink (Get-Uri $projectFullPath) "${projectPath}`e[1;96m${projectName}" # Bold bright cyan
+                $projectHeader += $projectDetails ? "${dim}${projectDetails}" : ""
+            }
+            else {
+                $projectHeader += $project ? $project : "${dim}(none)"
+            }
+
+            Write-Output "${projectHeader}${reset}"
+            $previousProject = $project
         }
 
-        Write-Output "`e[0m${filePath}`e[0;1;97m${hyperlink}`e[0;2m${location}: `e[0;${typeColor}m${type} ${code}`e[0m: ${message}`e[0m"
+        $fileLink = "${reset}${filePath}"
+        $fileLink += Get-Hyperlink (Get-Uri $fullPath $line $column) "`e[1;97m${fileName}" # Bold bright white
+
+        $typeColor = "`e[0;$($type -eq 'error' ? 91 : 93)m" # Red/Yellow
+
+        $typeIcon = switch ($type) {
+            'error' { '❌' }
+            'warning' { '⚠️' }
+            default { ' ' }
+        }
+
+        Write-Output "${reset}  ${typeIcon} ${fileLink}${dim}${location}: ${typeColor}${type} ${code}${reset}: ${message}${reset}"
     }
     else {
         if ($InputLine -match '^[ ]{4}[0-9]+ Warning\(s\)$') {
@@ -95,14 +144,14 @@ $
         }
 
         Write-Output $InputLine
-        $script:previousProject = $null
+        $previousProject = $null
     }
 }
 
 end {
-    if (-not $script:buildResultSeen) {
+    if (-not $hasBuildResult) {
         Write-Output "`e[1A`e[2K" # Clear "Processing..."
-        Write-Output "`e[0;93mNo build result found in output. Please ensure this script is used with the output of a dotnet build command.`e[0m"
+        Write-Output "`e[0;93mNo build result found in output. Please ensure this script is used with the output of a dotnet build command.${reset}"
         exit 1
     }
 }
