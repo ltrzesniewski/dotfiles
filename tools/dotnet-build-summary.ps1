@@ -5,9 +5,12 @@
 # Helps with large refactorings.
 #
 
+param(
+    [switch]$Short
+)
+
 begin {
     $script:hasBuildResult = $false
-    $script:hasStatusLine = $false
     $script:previousProject = $null
 
     $reset = "`e[0m"
@@ -16,8 +19,8 @@ begin {
     function Get-Uri {
         param (
             [string]$fullPath,
-            [string]$line,
-            [string]$column
+            [int]$line,
+            [int]$column
         )
         $uri = "vscode://file/$($fullPath.Replace('\', '/'))"
         $uri += $line ? ":$line" : ""
@@ -32,19 +35,6 @@ begin {
         )
         "`e]8;;${uri}`e\${text}`e]8;;`e\" # OSC 8 hyperlink
     }
-
-    function Write-StatusLine {
-        param (
-            [string]$text,
-            [bool]$keep = $false
-        )
-        $text = $text.Length -gt 60 ? "$($text.Substring(0, 60 - 3))..." : $text # Trim long lines to clear them easily later
-        $text = $script:hasStatusLine ? "`e[1A`e[2K`r${text}" : $text # Clear the previous line
-        Write-Output $text
-        $script:hasStatusLine = -not $keep
-    }
-
-    Write-StatusLine "`e[0;1;3;94mProcessing...${reset}" # Bold italic bright blue
 }
 
 process {
@@ -54,7 +44,9 @@ process {
         # Check if this line is the build success of a project
         if ($inputLine -match '^  (?<project>[\w-.]+) -> ') {
             $project = $matches['project']
-            Write-StatusLine "${reset}  ✅ ${project}" $true
+            if (!$Short) {
+                Write-Output "${reset}  ✅ ${project}"
+            }
             return
         }
 
@@ -67,13 +59,14 @@ process {
                 default { $inputLine }
             }
 
-            Write-StatusLine ""
+            Write-Output ""
             Write-Output $coloredLine
+            Write-Progress -Completed
             return
         }
 
-        # Show the last line before the result as context
-        Write-StatusLine "${dim}${inputLine}${reset}"
+        # Hack Write-Progress to show the last log line
+        Write-Progress -Activity 'Build' -Status "`e[2K`r${reset}  $($inputLine.Trim())"
         return
     }
 
@@ -166,7 +159,7 @@ $
 
 end {
     if (-not $script:hasBuildResult) {
-        Write-StatusLine ""
+        Write-Output ""
         Write-Output "`e[0;93mNo build result found in output. Please ensure this script is used with the output of a dotnet build command.${reset}"
         exit 1
     }
