@@ -5,14 +5,10 @@
 # Helps with large refactorings.
 #
 
-param(
-    [Parameter(ValueFromPipeline = $true)]
-    [string]$InputLine
-)
-
 begin {
-    $hasBuildResult = $false
-    $previousProject = $null
+    $script:hasBuildResult = $false
+    $script:hasStatusLine = $false
+    $script:previousProject = $null
 
     $reset = "`e[0m"
     $dim = "`e[0;2m"
@@ -37,34 +33,54 @@ begin {
         "`e]8;;${uri}`e\${text}`e]8;;`e\" # OSC 8 hyperlink
     }
 
-    Write-Output "`e[0;1;3;94mProcessing...${reset}" # Bold italic bright blue
+    function Write-StatusLine {
+        param (
+            [string]$text,
+            [bool]$keep = $false
+        )
+        $text = $text.Length -gt 60 ? "$($text.Substring(0, 60 - 3))..." : $text # Trim long lines to clear them easily later
+        $text = $script:hasStatusLine ? "`e[1A`e[2K`r${text}" : $text # Clear the previous line
+        Write-Output $text
+        $script:hasStatusLine = -not $keep
+    }
+
+    Write-StatusLine "`e[0;1;3;94mProcessing...${reset}" # Bold italic bright blue
 }
 
 process {
-    # Check if this line contains the build result message
-    if (-not $hasBuildResult -and $InputLine -match '^Build (?<result>succeeded|FAILED)\.') {
-        $hasBuildResult = $true
+    $inputLine = $_
 
-        $coloredLine = switch ($matches['result']) {
-            'succeeded' { "`e[0;1;92m${InputLine}${reset}" } # Bold bright green
-            'FAILED' { "`e[0;1;91m${InputLine}${reset}" } # Bold bright red
-            default { $InputLine }
+    if (-not $script:hasBuildResult) {
+        # Check if this line is the build success of a project
+        if ($inputLine -match '^  (?<project>[\w-.]+) -> ') {
+            $project = $matches['project']
+            Write-StatusLine "${reset}  ✅ ${project}" $true
+            return
         }
 
-        Write-Output "`e[1A`e[2K" # Clear previous line
-        Write-Output $coloredLine
-        return
-    }
+        # Check if this line contains the build result message
+        if ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
+            $script:hasBuildResult = $true
+            $coloredLine = switch ($matches['result']) {
+                'succeeded' { "`e[0;1;92m${inputLine}${reset}" } # Bold bright green
+                'FAILED' { "`e[0;1;91m${inputLine}${reset}" } # Bold bright red
+                default { $inputLine }
+            }
 
-    # Skip all lines until the build result message
-    if (-not $hasBuildResult) {
+            Write-StatusLine ""
+            Write-Output $coloredLine
+            return
+        }
+
+        # Show the last line before the result as context
+        Write-StatusLine "${dim}${inputLine}${reset}"
         return
     }
 
     # Matches:
     # - C:\path\to\file.cs(line,column): error CS1234: Message [C:\path\to\project.csproj::TargetFramework=net10.0]
     # - C:\path\to\project.csproj : warning NU1234: Message [C:\path\to\solution.sln]
-    if ($InputLine -match @'
+    if ($inputLine -match @'
 (?x) ^
 (?<fullPath>
     (?<filePath> .+? [\\/] )
@@ -93,8 +109,8 @@ $
         $message = $matches['message']
         $project = $matches['project']
 
-        if ($project -ne $previousProject) {
-            if ($previousProject) {
+        if ($project -ne $script:previousProject) {
+            if ($script:previousProject) {
                 Write-Output "" # Add spacing between projects
             }
 
@@ -122,7 +138,7 @@ $
             }
 
             Write-Output "${projectHeader}${reset}"
-            $previousProject = $project
+            $script:previousProject = $project
         }
 
         $fileLink = "${reset}${filePath}"
@@ -139,18 +155,18 @@ $
         Write-Output "${reset}  ${typeIcon} ${fileLink}${dim}${location}: ${typeColor}${type} ${code}${reset}: ${message}${reset}"
     }
     else {
-        if ($InputLine -match '^[ ]{4}[0-9]+ Warning\(s\)$') {
+        if ($inputLine -match '^[ ]{4}[0-9]+ Warning\(s\)$') {
             Write-Output ""
         }
 
-        Write-Output $InputLine
-        $previousProject = $null
+        Write-Output $inputLine
+        $script:previousProject = $null
     }
 }
 
 end {
-    if (-not $hasBuildResult) {
-        Write-Output "`e[1A`e[2K" # Clear "Processing..."
+    if (-not $script:hasBuildResult) {
+        Write-StatusLine ""
         Write-Output "`e[0;93mNo build result found in output. Please ensure this script is used with the output of a dotnet build command.${reset}"
         exit 1
     }
