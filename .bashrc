@@ -34,7 +34,7 @@ rm_binobj() {
 
 fdf() {
     fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --scheme=path --footer="$(pwd)" --preview='bat --color=always --style=plain {} 2> /dev/null || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' -m)
-    echo "$fdf"
+    echo "$fdf" # Intentional shadowing
 }
 
 fdh() {
@@ -56,8 +56,9 @@ cdr() {
 cdf() {
     local currentDir="$(pwd)"
     local baseDir="$(git rev-parse --show-toplevel 2> /dev/null || echo "$currentDir")"
+    local footer="$([[ "$baseDir" == "$currentDir" ]] && echo "$baseDir" || echo -e "Search:  $baseDir\nCurrent: $currentDir")"
     cd "$baseDir"
-    cd "$((echo .; fd --type=d --color=always "${@:-.}") | fzf --ansi --scheme=path --footer="$baseDir" --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || echo "$currentDir")"
+    cd "$((echo .; fd --type=d --color=always "${@:-.}") | fzf --ansi --scheme=path --footer="$footer" --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || echo "$currentDir")"
 }
 
 gs() {
