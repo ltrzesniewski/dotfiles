@@ -15,6 +15,12 @@ function cdr {
     Set-Location (git rev-parse --show-toplevel || Get-Location)
 }
 
+# fd find
+function fdf {
+    $global:fdf = fd --color=always @args | fzf --ansi --scheme=path --footer="$(Get-Location)" --preview="bat --color=always --style=plain {} 2> $($IsWindows ? 'NUL' : '/dev/null') || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}" -m
+    $global:fdf
+}
+
 # cd find (in current git repo, if any)
 function cdf {
     $currentDir = (Get-Location).Path

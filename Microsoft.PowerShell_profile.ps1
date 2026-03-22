@@ -54,12 +54,6 @@ function dbs {
     dotnet build @args | & "$PSScriptRoot/tools/dotnet/build-summary.ps1"
 }
 
-# fd find
-function fdf {
-    $global:fdf = fd --color=always @args | fzf --ansi --scheme=path --footer="$(Get-Location)" --preview='bat --color=always --style=plain {} 2> $null || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' -m
-    $global:fdf
-}
-
 # fd hyperlink
 function fdh {
     fd --hyperlink=auto @args
