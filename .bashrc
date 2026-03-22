@@ -20,7 +20,7 @@ export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 export BAT_CONFIG_DIR=~/dotfiles/bat
 
 export FZF_DEFAULT_OPTS='
-    --style full
+    --style full:rounded
     --reverse
     --color dark,hl:bright-red:underline,hl+:bright-red:underline
 '
@@ -29,11 +29,11 @@ source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 
 rm_binobj() {
-    find -type d \( -name bin -o -name obj \) -exec rm -r {} +
+    find -type d \( -name bin -o -name obj \) -prune -exec rm -r {} +
 }
 
 fdf() {
-    fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --scheme=path --preview='bat --color=always -n {}' -m)
+    fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --scheme=path --footer="$(pwd)" --preview='bat --color=always --style=plain {} 2> /dev/null || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' -m)
     echo "$fdf"
 }
 
@@ -54,5 +54,16 @@ cdr() {
 }
 
 cdf() {
-    cd "$(fd --type=d --color=always "${@:-.}" "$(git rev-parse --show-toplevel 2> /dev/null || pwd)" | fzf --ansi --scheme=path --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || pwd)"
+    local currentDir="$(pwd)"
+    local baseDir="$(git rev-parse --show-toplevel 2> /dev/null || echo "$currentDir")"
+    cd "$baseDir"
+    cd "$((echo .; fd --type=d --color=always "${@:-.}") | fzf --ansi --scheme=path --footer="$baseDir" --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || echo "$currentDir")"
+}
+
+gs() {
+    git status "$@" && echo "" && git log -1 --pretty=short
+}
+
+gpr() {
+    git pull --rebase "$@"
 }

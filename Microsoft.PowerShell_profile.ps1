@@ -38,7 +38,7 @@ Import-Module -Name Terminal-Icons -ErrorAction Ignore
 $env:BAT_CONFIG_DIR = "$PSScriptRoot/bat"
 
 $env:FZF_DEFAULT_OPTS = @'
-    --style full
+    --style full:rounded
     --reverse
     --color dark,hl:bright-red:underline,hl+:bright-red:underline
 '@
@@ -51,28 +51,28 @@ function Remove-BinObj {
 
 # dotnet build summary
 function dbs {
-    dotnet build $args | & "$PSScriptRoot/tools/dotnet/build-summary.ps1"
+    dotnet build @args | & "$PSScriptRoot/tools/dotnet/build-summary.ps1"
 }
 
 # fd find
 function fdf {
-    $global:fdf = fd --color=always $args | fzf --ansi --scheme=path --preview='bat --color=always -n {}' -m
+    $global:fdf = fd --color=always @args | fzf --ansi --scheme=path --footer="$(Get-Location)" --preview='bat --color=always --style=plain {} 2> $null || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' -m
     $global:fdf
 }
 
 # fd hyperlink
 function fdh {
-    fd --hyperlink=auto $args
+    fd --hyperlink=auto @args
 }
 
 # rg raw
 function rgr {
-    rg --no-heading --no-filename --no-line-number $args
+    rg --no-heading --no-filename --no-line-number @args
 }
 
 # rg delta
 function rgd {
-    rg --json $args | delta
+    rg --json @args | delta
 }
 
 # Aliases
