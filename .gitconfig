@@ -40,3 +40,5 @@
 	hyperlinks = true
 	hyperlinks-file-link-format = "vscode://file/{path}:{line}"
 	hunk-header-style = omit
+	grep-match-word-style = "brightwhite bold 88"
+	blame-palette = 232 233 234 235 236 237 238 239 240 241 242 243
