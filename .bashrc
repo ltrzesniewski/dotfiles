@@ -19,6 +19,12 @@ export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 export BAT_CONFIG_DIR=~/dotfiles/bat
 
+export FZF_DEFAULT_OPTS='
+    --style full
+    --reverse
+    --color dark,hl:bright-red:underline,hl+:bright-red:underline
+'
+
 source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 
@@ -27,7 +33,7 @@ rm_binobj() {
 }
 
 fdf() {
-    fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --reverse --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m)
+    fdf=$(fd --strip-cwd-prefix --color=always "$@" | fzf --ansi --scheme=path --preview='bat --color=always -n {}' -m)
     echo "$fdf"
 }
 
@@ -48,5 +54,5 @@ cdr() {
 }
 
 cdf() {
-    cd "$(fd --type=d --color=always "${@:-.}" "$(git rev-parse --show-toplevel 2> /dev/null || pwd)" | fzf --ansi --reverse --scheme=path || pwd)"
+    cd "$(fd --type=d --color=always "${@:-.}" "$(git rev-parse --show-toplevel 2> /dev/null || pwd)" | fzf --ansi --scheme=path --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || pwd)"
 }

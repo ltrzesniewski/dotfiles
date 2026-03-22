@@ -31,9 +31,17 @@ if (Get-Command rg -ErrorAction Ignore) {
     rg --generate complete-powershell | Out-String | Invoke-Expression
 }
 
+Import-Module -Name Terminal-Icons -ErrorAction Ignore
+
+# Configuration
+
 $env:BAT_CONFIG_DIR = "$PSScriptRoot/bat"
 
-Import-Module -Name Terminal-Icons -ErrorAction Ignore
+$env:FZF_DEFAULT_OPTS = @'
+    --style full
+    --reverse
+    --color dark,hl:bright-red:underline,hl+:bright-red:underline
+'@
 
 # Custom functions
 
@@ -41,20 +49,29 @@ function Remove-BinObj {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
 
-function fdf { # fd find
-    $global:fdf = fd --color=always $args | fzf --ansi --reverse --style=full --preview='bat --color=always -n {}' --scheme=path --color='dark,hl:bright-red:underline,hl+:bright-red:underline' -m
+# dotnet build summary
+function dbs {
+    dotnet build $args | & "$PSScriptRoot/tools/dotnet/build-summary.ps1"
+}
+
+# fd find
+function fdf {
+    $global:fdf = fd --color=always $args | fzf --ansi --scheme=path --preview='bat --color=always -n {}' -m
     $global:fdf
 }
 
-function fdh { # fd hyperlink
+# fd hyperlink
+function fdh {
     fd --hyperlink=auto $args
 }
 
-function rgr { # rg raw
+# rg raw
+function rgr {
     rg --no-heading --no-filename --no-line-number $args
 }
 
-function rgd { # rg delta
+# rg delta
+function rgd {
     rg --json $args | delta
 }
 
