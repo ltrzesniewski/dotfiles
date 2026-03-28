@@ -35,13 +35,3 @@ function cdf {
 
     Set-Location ($selectedDir ? (Resolve-Path -Path $selectedDir -RelativeBasePath $baseDir) : $currentDir)
 }
-
-# git status
-function gs {
-    git status @args && Write-Host "" && git log -1 --pretty=short
-}
-
-# git pull --rebase
-function gpr {
-    git pull --rebase @args
-}

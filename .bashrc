@@ -60,11 +60,3 @@ cdf() {
     cd "$baseDir"
     cd "$((echo .; fd --type=d --color=always "${@:-.}") | fzf --ansi --scheme=path --footer="$footer" --preview='fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}' || echo "$currentDir")"
 }
-
-gs() {
-    git status "$@" && echo "" && git log -1 --pretty=short
-}
-
-gpr() {
-    git pull --rebase "$@"
-}

@@ -13,14 +13,28 @@
 	updateRefs = false
 
 [alias]
-	mylog = "log --author='Lucas Trzesniewski' --all --date-order --format='%C(#6F4E37)%h  %C(#A67B5B)%as%C(reset)  %s'"
+	mylog = "!f() { git log --author=\"$(git config user.email)\" --all --date-order --format=mylog \"$@\"; }; f"
+	amend = commit --all --amend --no-edit
+	co = checkout
 	ck = "!f() { git fetch origin && git checkout -B $1 origin/$1; }; f"
+	sw = switch
+	st = !git status "$@" && echo '\n\nLast commit:\n' && git log -1 --format=short
+	ll = log -50
+	lb = log --first-parent --ignore-missing HEAD ^origin/master ^origin/main ^upstream/master ^upstream/main
+	lg = log --graph --all -50
+	pr = pull --rebase
+	cm = commit --all --message
+	dh = diff HEAD
+	dp = diff HEAD^
+	aa = add --all
+	fa = fetch --all
 
 [format]
 	pretty = simple
 
 [pretty]
 	simple = "%C(#6F4E37)%h  %C(#A67B5B)%as  %<(20,trunc)%C(#ECB176)%an%C(reset)  %<(60,trunc)%s %C(#FED8B1)%d"
+	mylog = "%C(#6F4E37)%h  %C(#A67B5B)%as%C(reset)  %s"
 
 [interactive]
 	diffFilter = delta --color-only
