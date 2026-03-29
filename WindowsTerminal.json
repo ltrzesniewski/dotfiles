@@ -8,8 +8,10 @@
     "profiles": {
         "defaults": {
             "antialiasingMode": "cleartype",
+            "background": "#141414",
             "closeOnExit": "never",
-            "colorScheme": "Dark+",
+            "colorScheme": "Ottosson",
+            "cursorColor": "#FFFFFF",
             "font": {
                 "axes": {
                     "wdth": 90
