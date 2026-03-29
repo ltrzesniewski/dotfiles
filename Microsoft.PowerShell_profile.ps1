@@ -1,41 +1,40 @@
 
+# Shell tools
+
 if (Get-Command oh-my-posh -ErrorAction Ignore) {
     oh-my-posh init pwsh --config "$PSScriptRoot/prompt.omp.json" | Invoke-Expression
 }
 
-if ((Get-Command atuin -ErrorAction Ignore) -and (Get-Module PSReadLine -ErrorAction Ignore)) {
-    $env:ATUIN_CONFIG_DIR = "$PSScriptRoot/atuin"
+if (Get-Command atuin -ErrorAction Ignore) {
     atuin init powershell | Out-String | Invoke-Expression
 }
 
-if (Get-Command dotnet -ErrorAction Ignore) {
-    if ([int]($(dotnet --version) -replace '^(\d+)\..+', '$1') -ge 10) {
-        dotnet completions script pwsh | Out-String | Invoke-Expression -ErrorAction Ignore
-    }
-    else {
-        Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-            param($wordToComplete, $commandAst, $cursorPosition)
-            dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-            }
-        }
-    }
+# Argument completion
+
+function Register-LazyCompleter {
+    param ([string]$CommandName, [scriptblock]$ScriptBlock)
+
+    # This requires pressing Ctrl+Space twice the first time, but it avoids loading the completion script until it's actually needed.
+    Register-ArgumentCompleter -Native -CommandName $CommandName -ScriptBlock {
+        & $ScriptBlock | Out-String | Invoke-Expression
+        $null
+    }.GetNewClosure()
 }
 
-if (Get-Command kubectl -ErrorAction Ignore) {
-    kubectl completion powershell | Out-String | Invoke-Expression
-}
-
-if (Get-Command rg -ErrorAction Ignore) {
-    $env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/.ripgreprc"
-    rg --generate complete-powershell | Out-String | Invoke-Expression
-}
-
-Import-Module -Name Terminal-Icons -ErrorAction Ignore
+Register-LazyCompleter 'atuin' { atuin gen-completions --shell powershell }
+Register-LazyCompleter 'bat' { bat --completion ps1 }
+Register-LazyCompleter 'delta' { delta --generate-completion powershell }
+Register-LazyCompleter 'dotnet' { dotnet completions script pwsh }
+Register-LazyCompleter 'fd' { fd --gen-completions powershell }
+Register-LazyCompleter 'kubectl' { kubectl completion powershell }
+Register-LazyCompleter 'rg' { rg --generate complete-powershell }
+Register-LazyCompleter 'rustup' { rustup completions powershell }
 
 # Configuration
 
+$env:ATUIN_CONFIG_DIR = "$PSScriptRoot/atuin"
 $env:BAT_CONFIG_DIR = "$PSScriptRoot/bat"
+$env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/.ripgreprc"
 
 $env:FZF_DEFAULT_OPTS = @'
     --style full:rounded
