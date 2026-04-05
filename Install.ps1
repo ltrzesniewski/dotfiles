@@ -72,6 +72,10 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
     Install-App "ripgrep" { cargo install --locked ripgrep --features pcre2 }
 }
 
+# Install PowerShell modules
+
+Update-Module git-completion
+
 Write-Host ""
 Write-Host -ForegroundColor Yellow "DONE"
 Write-Host ""

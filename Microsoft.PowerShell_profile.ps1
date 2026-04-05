@@ -26,6 +26,7 @@ Register-LazyCompleter 'bat' { bat --completion ps1 }
 Register-LazyCompleter 'delta' { delta --generate-completion powershell }
 Register-LazyCompleter 'dotnet' { dotnet completions script pwsh }
 Register-LazyCompleter 'fd' { fd --gen-completions powershell }
+Register-LazyCompleter 'git' { Import-Module git-completion }
 Register-LazyCompleter 'kubectl' { kubectl completion powershell }
 Register-LazyCompleter 'rg' { rg --generate complete-powershell }
 Register-LazyCompleter 'rustup' { rustup completions powershell }
