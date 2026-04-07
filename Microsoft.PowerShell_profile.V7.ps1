@@ -3,13 +3,13 @@
 
 $PSStyle.FileInfo.Directory = "`e[1;96m" # Bold bright cyan
 $PSStyle.FileInfo.SymbolicLink = "`e[95m" # Bright magenta
-$PSStyle.FileInfo.Executable = "`e[93m" # Bright yellow
+$PSStyle.FileInfo.Executable = "`e[91m" # Bright red
 
-foreach ($key in $PSStyle.FileInfo.Extension.Keys) {
-    # Remove bold from files - use it for directories only
-    # Compressed files: bright blue, similar to directories
-    # Leave PowerShell files in yellow, similar to executables
-    $PSStyle.FileInfo.Extension[$key] = $PSStyle.FileInfo.Extension[$key].Replace(";1m", "m").Replace("`e[31m", "`e[94m")
+$PSStyle.FileInfo.Extension.Clear()
+$PSStyle.FileInfo.Extension['.ps1'] = "`e[31m" # Red
+
+foreach ($key in @('.csproj', '.props', '.targets', '.sln', '.slnx', '.toml')) {
+    $PSStyle.FileInfo.Extension[$key] = "`e[93m" # Bright yellow
 }
 
 # Custom functions

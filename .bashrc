@@ -14,7 +14,19 @@ fi
 
 command -v rg &> /dev/null && source <(rg --generate complete-bash)
 
-export LS_COLORS=$LS_COLORS:'tw=00;33:ow=01;33:'
+# ls colors
+
+LS_COLORS="${LS_COLORS}:tw=0;33:ow=1;33"
+LS_COLORS="${LS_COLORS}:di=1;96:ln=95:ex=91"
+
+for item in csproj props targets sln slnx toml; do
+    LS_COLORS="${LS_COLORS}:*.${item}=93"
+done
+
+export LS_COLORS
+
+# Configuration
+
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 export BAT_CONFIG_DIR=~/dotfiles/bat
