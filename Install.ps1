@@ -74,7 +74,7 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
 
 # Install PowerShell modules
 
-Update-Module git-completion
+Install-Module git-completion
 
 Write-Host ""
 Write-Host -ForegroundColor Yellow "DONE"

@@ -13,7 +13,7 @@
 	updateRefs = false
 
 [alias]
-	mylog = "!f() { git log --author=\"$(git config user.email)\" --all --date-order --format=mylog \"$@\"; }; f"
+	mylog = "!f() { git fetch --all --quiet && git log --author=\"$(git config user.email)\" --all --date-order --format=mylog \"$@\"; }; f"
 	amend = commit --all --amend --no-edit
 	co = checkout
 	ck = "!f() { git fetch origin && git checkout -B $1 origin/$1; }; f"

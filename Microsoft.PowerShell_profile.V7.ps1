@@ -19,6 +19,7 @@ function Update-Dotfiles {
         Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
         Push-Location -Path $PSScriptRoot -ErrorAction Stop
         git pull -r && ./Install.ps1
+        . $PROFILE
     }
     finally {
         Pop-Location
