@@ -6,7 +6,11 @@ if (Get-Command oh-my-posh -ErrorAction Ignore) {
 }
 
 if (Get-Command atuin -ErrorAction Ignore) {
+    $prevSession = $env:ATUIN_SESSION
     atuin init powershell | Out-String | Invoke-Expression
+    if ($prevSession) {
+        $env:ATUIN_SESSION = $prevSession
+    }
 }
 
 # Argument completion
