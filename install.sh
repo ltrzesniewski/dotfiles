@@ -59,6 +59,9 @@ if command -v cargo &> /dev/null; then
 
     startInstall ripgrep
     cargo install --locked ripgrep --features pcre2
+
+    startInstall vivid
+    cargo install --locked vivid
 fi
 
 echo

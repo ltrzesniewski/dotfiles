@@ -1,15 +1,45 @@
 
-# Configuration
+# Colors
 
-$PSStyle.FileInfo.Directory = "`e[1;96m" # Bold bright cyan
-$PSStyle.FileInfo.SymbolicLink = "`e[95m" # Bright magenta
-$PSStyle.FileInfo.Executable = "`e[91m" # Bright red
+& {
+    $PSStyle.FileInfo.Directory = "`e[0;1;96m" # Bold bright cyan
+    $PSStyle.FileInfo.SymbolicLink = "`e[0;95m" # Bright magenta
+    $PSStyle.FileInfo.Executable = "`e[0;91m" # Bright red
 
-$PSStyle.FileInfo.Extension.Clear()
-$PSStyle.FileInfo.Extension['.ps1'] = "`e[31m" # Red
+    $PSStyle.FileInfo.Extension.Clear()
+    $PSStyle.FileInfo.Extension['.ps1'] = "`e[0;31m" # Red
 
-foreach ($key in @('.csproj', '.props', '.targets', '.sln', '.slnx', '.toml')) {
-    $PSStyle.FileInfo.Extension[$key] = "`e[93m" # Bright yellow
+    foreach ($key in @('.csproj', '.props', '.targets', '.sln', '.slnx', '.toml')) {
+        $PSStyle.FileInfo.Extension[$key] = "`e[0;1;93m" # Bold bright yellow
+    }
+
+    if (Get-Command vivid -ErrorAction Ignore) {
+        $colors = vivid generate 'catppuccin-mocha'
+
+        $colors = $colors -replace '\bdi=0;', 'di=0;1;' # Make directories bold
+
+        foreach ($key in $PSStyle.FileInfo.Extension.Keys) {
+            $colors += ":*$key=" + ($PSStyle.FileInfo.Extension[$key] -replace "^`e\[|m$", '')
+        }
+
+        $env:LS_COLORS = $colors
+        $colorsByPattern = @{}
+
+        foreach ($item in $colors -split ':') {
+            $item = $item -split '=', 2
+            $colorsByPattern[$item[0]] = $item[1]
+        }
+
+        foreach ($key in $colorsByPattern.Keys) {
+            if ($key -match '^\*(\..+)$') {
+                $PSStyle.FileInfo.Extension[$Matches[1]] = "`e[$($colorsByPattern[$key])m"
+            }
+        }
+
+        $PSStyle.FileInfo.Directory = "`e[$($colorsByPattern['di'])m"
+        $PSStyle.FileInfo.SymbolicLink = "`e[$($colorsByPattern['ln'])m"
+        $PSStyle.FileInfo.Executable = "`e[$($colorsByPattern['ex'])m"
+    }
 }
 
 # Custom functions
@@ -19,7 +49,6 @@ function Update-Dotfiles {
         Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
         Push-Location -Path $PSScriptRoot -ErrorAction Stop
         git pull -r && ./Install.ps1
-        . $PROFILE
     }
     finally {
         Pop-Location

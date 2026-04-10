@@ -70,6 +70,7 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
     Install-App "delta" { cargo install --locked git-delta }
     Install-App "fd" { cargo install --locked fd-find }
     Install-App "ripgrep" { cargo install --locked ripgrep --features pcre2 }
+    Install-App "vivid" { cargo install --locked vivid }
 }
 
 # Install PowerShell modules
