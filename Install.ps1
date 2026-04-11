@@ -95,7 +95,8 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
 
 # Install PowerShell modules
 
-Install-App "git-completion" { Install-Module git-completion -Force -Scope CurrentUser }
+Set-PSRepository PSGallery -InstallationPolicy Trusted
+Install-App "git-completion" { Install-Module git-completion -Scope CurrentUser }
 
 # Reload profile
 
