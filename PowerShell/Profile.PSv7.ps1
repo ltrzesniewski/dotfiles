@@ -12,6 +12,10 @@ function Update-Dotfiles {
     }
 }
 
+function Update-Profile {
+    . "$PSScriptRoot/Profile.ps1" -Update
+}
+
 # cd root (of current git repo)
 function cdr {
     Set-Location (git rev-parse --show-toplevel || Get-Location)
