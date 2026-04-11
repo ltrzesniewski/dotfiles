@@ -16,13 +16,11 @@
     if (Get-Command vivid -ErrorAction Ignore) {
         $colors = vivid generate 'catppuccin-mocha'
 
-        $colors = $colors -replace '\bdi=0;', 'di=0;1;' # Make directories bold
-
         foreach ($key in $PSStyle.FileInfo.Extension.Keys) {
             $colors += ":*$key=" + ($PSStyle.FileInfo.Extension[$key] -replace "^`e\[|m$", '')
         }
 
-        $env:LS_COLORS = $colors
+        $colors = $colors -replace '\bdi=0;', 'di=0;1;' # Make directories bold
         $colorsByPattern = @{}
 
         foreach ($item in $colors -split ':') {
@@ -30,11 +28,28 @@
             $colorsByPattern[$item[0]] = $item[1]
         }
 
+        function Add-ColorAlias {
+            param ([string]$From, [string[]] $To)
+            $value = $colorsByPattern["*.$From"]
+            foreach ($ext in $To) {
+                $colorsByPattern["*.$ext"] = $value
+                $colors += "${colors}:*.${ext}=${value}"
+            }
+            $colors
+        }
+
+        $colors = Add-ColorAlias 'zip' 'nuget'
+        $colors = Add-ColorAlias 'sh' 'ps1'
+        $colors = Add-ColorAlias 'cs' 'cshtml', 'razor', 'xaml'
+        $colors = Add-ColorAlias 'lock' 'DotSettings', 'user', 'binlog', 'vsconfig'
+
         foreach ($key in $colorsByPattern.Keys) {
             if ($key -match '^\*(\..+)$') {
                 $PSStyle.FileInfo.Extension[$Matches[1]] = "`e[$($colorsByPattern[$key])m"
             }
         }
+
+        $env:LS_COLORS = $colors
 
         $PSStyle.FileInfo.Directory = "`e[$($colorsByPattern['di'])m"
         $PSStyle.FileInfo.SymbolicLink = "`e[$($colorsByPattern['ln'])m"
