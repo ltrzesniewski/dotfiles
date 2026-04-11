@@ -6,3 +6,5 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
 }
 
 . "$PSScriptRoot/Profile.Generated.ps1"
+
+Export-ModuleMember -Function (Get-ChildItem Function: | Where-Object { $_.ModuleName -eq 'Profile' }) -Alias *
