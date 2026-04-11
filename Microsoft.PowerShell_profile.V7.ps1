@@ -6,19 +6,8 @@
     $PSStyle.FileInfo.SymbolicLink = "`e[0;95m" # Bright magenta
     $PSStyle.FileInfo.Executable = "`e[0;91m" # Bright red
 
-    $PSStyle.FileInfo.Extension.Clear()
-    $PSStyle.FileInfo.Extension['.ps1'] = "`e[0;31m" # Red
-
-    foreach ($key in @('.csproj', '.props', '.targets', '.sln', '.slnx', '.toml')) {
-        $PSStyle.FileInfo.Extension[$key] = "`e[0;1;93m" # Bold bright yellow
-    }
-
     if (Get-Command vivid -ErrorAction Ignore) {
         $colors = vivid generate 'catppuccin-mocha'
-
-        foreach ($key in $PSStyle.FileInfo.Extension.Keys) {
-            $colors += ":*$key=" + ($PSStyle.FileInfo.Extension[$key] -replace "^`e\[|m$", '')
-        }
 
         $colors = $colors -replace '\bdi=0;', 'di=0;1;' # Make directories bold
         $colorsByPattern = @{}
@@ -28,28 +17,49 @@
             $colorsByPattern[$item[0]] = $item[1]
         }
 
-        function Add-ColorAlias {
-            param ([string]$From, [string[]] $To)
-            $value = $colorsByPattern["*.$From"]
+        $context = @{ colors = $colors }
+
+        function Add-Color {
+            param ([string]$ColorCode, [switch]$Bold, [string[]] $To)
+
+            $value = if ($ColorCode -match '^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})$' ) {
+                $r = [int]::Parse($Matches[1], 'HexNumber')
+                $g = [int]::Parse($Matches[2], 'HexNumber')
+                $b = [int]::Parse($Matches[3], 'HexNumber')
+                "38;2;${r};${g};${b}"
+            }
+            else {
+                $ColorCode
+            }
+
+            if ($Bold) { $value = "1;${value}" }
+            if (-not $value.StartsWith('0;')) { $value = "0;${value}" }
+
             foreach ($ext in $To) {
                 $colorsByPattern["*.$ext"] = $value
-                $colors += "${colors}:*.${ext}=${value}"
+                $context.colors += ":*.${ext}=${value}"
             }
-            $colors
         }
 
-        $colors = Add-ColorAlias 'zip' 'nuget'
-        $colors = Add-ColorAlias 'sh' 'ps1'
-        $colors = Add-ColorAlias 'cs' 'cshtml', 'razor', 'xaml'
-        $colors = Add-ColorAlias 'lock' 'DotSettings', 'user', 'binlog', 'vsconfig'
+        function Add-ColorAlias {
+            param ([string]$From, [string[]] $To)
+            Add-Color -ColorCode $colorsByPattern["*.$From"] -To $To
+        }
 
+        Add-Color '#ffc944' -Bold 'csproj', 'props', 'targets', 'sln', 'slnx', 'toml'
+        Add-ColorAlias 'zip' 'nuget'
+        Add-ColorAlias 'sh' 'ps1'
+        Add-ColorAlias 'cs' 'cshtml', 'razor', 'xaml'
+        Add-ColorAlias 'lock' 'DotSettings', 'user', 'binlog', 'vsconfig'
+
+        $PSStyle.FileInfo.Extension.Clear()
         foreach ($key in $colorsByPattern.Keys) {
             if ($key -match '^\*(\..+)$') {
                 $PSStyle.FileInfo.Extension[$Matches[1]] = "`e[$($colorsByPattern[$key])m"
             }
         }
 
-        $env:LS_COLORS = $colors
+        $env:LS_COLORS = $context.colors
 
         $PSStyle.FileInfo.Directory = "`e[$($colorsByPattern['di'])m"
         $PSStyle.FileInfo.SymbolicLink = "`e[$($colorsByPattern['ln'])m"
