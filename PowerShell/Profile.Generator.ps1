@@ -1,9 +1,41 @@
 
+Write-Output ""
+Write-Output "# Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+
+if (Get-Command "git" -ErrorAction Ignore) {
+    $commitHash = git -C $PSScriptRoot rev-parse HEAD
+    Write-Output "# Commit: $commitHash"
+}
+
+# Atuin
+
+if (Get-Command atuin -ErrorAction Ignore) {
+    Write-Output @"
+
+# Atuin: $(atuin --version)
+
+& {
+    `$prevSession = `$env:ATUIN_SESSION
+
+$(atuin init powershell | Out-String)
+    `$env:ATUIN_SESSION = if (`$prevSession) { `$prevSession } else { [Guid]::NewGuid().ToString('N') }
+}
+"@
+}
+else {
+    Write-Warning "MISSING: atuin"
+}
+
 # Colors
 
 if (Get-Command vivid -ErrorAction Ignore) {
-    $colors = vivid generate 'catppuccin-mocha'
+    $theme = 'catppuccin-mocha'
 
+    Write-Output ""
+    Write-Output "# Vivid: $(vivid --version)"
+    Write-Output "# Theme: $theme"
+
+    $colors = vivid generate $theme
     $colors = $colors -replace '\bdi=0;', 'di=0;1;' # Make directories bold
     $colorsByPattern = @{}
 
@@ -47,13 +79,6 @@ if (Get-Command vivid -ErrorAction Ignore) {
     Add-ColorAlias 'cs' 'cshtml', 'razor', 'xaml'
     Add-ColorAlias 'lock' 'DotSettings', 'user', 'binlog', 'vsconfig'
 
-    $PSStyle.FileInfo.Extension.Clear()
-    foreach ($key in $colorsByPattern.Keys) {
-        if ($key -match '^\*(\..+)$') {
-            $PSStyle.FileInfo.Extension[$Matches[1]] = "`e[$($colorsByPattern[$key])m"
-        }
-    }
-
     $colors = $context.colors
 
     Write-Output @"
@@ -61,6 +86,7 @@ if (Get-Command vivid -ErrorAction Ignore) {
 `$env:LS_COLORS = '$colors'
 
 `$ext = `$PSStyle.FileInfo.Extension;
+
 if (`$null -ne `$ext) {
     `$PSStyle.FileInfo.Directory = "``e[$($colorsByPattern['di'])m"
     `$PSStyle.FileInfo.SymbolicLink = "``e[$($colorsByPattern['ln'])m"
