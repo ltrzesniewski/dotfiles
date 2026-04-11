@@ -99,8 +99,8 @@ Install-App "git-completion" { Install-Module git-completion -Force -Scope Curre
 
 # Reload profile
 
-Write-Header "RELOADING: PowerShell profile"
-. "$PSScriptRoot/PowerShell/Profile.ps1"
+Write-Header "UPDATING: PowerShell profile"
+. "$PSScriptRoot/PowerShell/Profile.ps1" -Update
 
 Write-Header "DONE"
 Write-Host ""
