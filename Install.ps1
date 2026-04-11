@@ -1,4 +1,11 @@
 
+Function Write-Header {
+    param ([string]$Text)
+
+    Write-Host ""
+    Write-Host -ForegroundColor Yellow $Text
+}
+
 Function Install-App {
     param (
         [string]$AppName,
@@ -6,8 +13,7 @@ Function Install-App {
         [int[]]$ValidExitCodes = @()
     )
 
-    Write-Host ""
-    Write-Host -ForegroundColor Yellow "INSTALLING: $AppName"
+    Write-Header "INSTALLING: $AppName"
     & @ScriptBlock
     if ($LastExitCode -ne 0 -and $ValidExitCodes -notcontains $LastExitCode) {
         Write-Host -ForegroundColor Red "    FAILED: $AppName"
@@ -26,21 +32,35 @@ Function Install-WinGet {
 
 # Add profile script and other one-time stuff
 
-if (!(Test-Path -Path $PROFILE)) {
-    New-Item -ItemType File -Path $PROFILE -Force | Out-Null
-}
-
-if (!(Select-String -Path $PROFILE -Pattern "~/dotfiles/Microsoft.PowerShell_profile.ps1" -Quiet)) {
-    Add-Content -Path $PROFILE -Value ". ~/dotfiles/Microsoft.PowerShell_profile.ps1"
-}
-
-if (Get-Command "git" -ErrorAction SilentlyContinue) {
-    $gitcfg = git config list --global
-    if ($gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig') {
-        git config set --global --append include.path '~/dotfiles/.gitconfig'
+& {
+    if (!(Test-Path -Path $PROFILE)) {
+        New-Item -ItemType File -Path $PROFILE -Force | Out-Null
     }
-    if ($gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig-windows') {
-        git config set --global --append include.path '~/dotfiles/.gitconfig-windows'
+
+    $origContent = Get-Content -LiteralPath $PROFILE -Raw -Encoding UTF8
+    $content = $origContent.Replace('. ~/dotfiles/Microsoft.PowerShell_profile.ps1', '. ~/dotfiles/PowerShell/Profile.ps1')
+    if (-not $content.Contains('. ~/dotfiles/PowerShell/Profile.ps1')) {
+        $content = @"
+. ~/dotfiles/PowerShell/Profile.ps1
+
+$content
+"@
+    }
+
+    if ($content -ne $origContent) {
+        Write-Host ""
+        Write-Host -ForegroundColor Yellow "UPDATING: PowerShell profile"
+        Set-Content -LiteralPath $PROFILE -Value $content -Encoding UTF8
+    }
+
+    if (Get-Command "git" -ErrorAction SilentlyContinue) {
+        $gitcfg = git config list --global
+        if ($gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig') {
+            git config set --global --append include.path '~/dotfiles/.gitconfig'
+        }
+        if ($IsWindows -and $gitcfg -notcontains 'include.path=~/dotfiles/.gitconfig-windows') {
+            git config set --global --append include.path '~/dotfiles/.gitconfig-windows'
+        }
     }
 }
 
@@ -75,8 +95,12 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
 
 # Install PowerShell modules
 
-Install-Module git-completion
+Install-App "git-completion" { Install-Module git-completion -Force -Scope CurrentUser }
 
-Write-Host ""
-Write-Host -ForegroundColor Yellow "DONE"
+# Reload profile
+
+Write-Header "RELOADING: PowerShell profile"
+. "$PSScriptRoot/PowerShell/Profile.ps1"
+
+Write-Header "DONE"
 Write-Host ""

@@ -72,7 +72,7 @@
 function Update-Dotfiles {
     try {
         Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
-        Push-Location -Path $PSScriptRoot -ErrorAction Stop
+        Push-Location -Path "$PSScriptRoot/.." -ErrorAction Stop
         git pull -r && ./Install.ps1
     }
     finally {
