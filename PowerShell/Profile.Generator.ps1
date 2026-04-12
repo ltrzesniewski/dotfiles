@@ -7,25 +7,6 @@ if (Get-Command "git" -ErrorAction Ignore) {
     Write-Output "# Commit: $commitHash"
 }
 
-# Atuin
-
-if (Get-Command atuin -ErrorAction Ignore) {
-    Write-Output @"
-
-# Atuin: $(atuin --version)
-
-& {
-    `$prevSession = `$env:ATUIN_SESSION
-
-$(atuin init powershell | Out-String)
-    `$env:ATUIN_SESSION = if (`$prevSession) { `$prevSession } else { [Guid]::NewGuid().ToString('N') }
-}
-"@
-}
-else {
-    Write-Warning "MISSING: atuin"
-}
-
 # Colors
 
 if (Get-Command vivid -ErrorAction Ignore) {

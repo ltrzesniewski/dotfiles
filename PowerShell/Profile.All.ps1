@@ -5,6 +5,14 @@ if (Get-Command oh-my-posh -ErrorAction Ignore) {
     oh-my-posh init pwsh --config "$PSScriptRoot/../prompt.omp.json" | Invoke-Expression
 }
 
+if (Get-Command atuin -ErrorAction Ignore) {
+    $prevSession = $env:ATUIN_SESSION
+    atuin init powershell | Out-String | Invoke-Expression
+    if ($prevSession) {
+        $env:ATUIN_SESSION = $prevSession
+    }
+}
+
 # Argument completion
 
 function Register-LazyCompleter {

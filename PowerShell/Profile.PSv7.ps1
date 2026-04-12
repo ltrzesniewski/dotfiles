@@ -13,6 +13,7 @@ function Update-Dotfiles {
 }
 
 function Update-Profile {
+    Remove-Module Profile
     . "$PSScriptRoot/Profile.ps1" -Update
 }
 
