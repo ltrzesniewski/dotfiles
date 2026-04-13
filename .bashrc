@@ -16,6 +16,8 @@ command -v rg &> /dev/null && source <(rg --generate complete-bash)
 
 # ls colors
 
+command -v atuin &> /dev/null && LS_COLORS="$(vivid generate catppuccin-mocha)"
+
 LS_COLORS="${LS_COLORS}:tw=0;33:ow=1;33"
 LS_COLORS="${LS_COLORS}:di=1;96:ln=95:ex=91"
 
