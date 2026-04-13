@@ -30,6 +30,11 @@ Function Install-WinGet {
     Install-App $AppName { winget install --source winget --silent --exact $PackageName } -ValidExitCodes @(0x8A15002B)
 }
 
+Function Install-ProfileModule {
+    param ([string]$ModuleName)
+    Install-App $ModuleName { Update-Module $ModuleName || Install-Module $ModuleName -Scope CurrentUser -Force }
+}
+
 # Add profile script and other one-time stuff
 
 & {
@@ -96,7 +101,7 @@ if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
 # Install PowerShell modules
 
 Set-PSRepository PSGallery -InstallationPolicy Trusted
-Install-App "git-completion" { Install-Module git-completion -Scope CurrentUser }
+Install-ProfileModule "git-completion"
 
 # Reload profile
 
