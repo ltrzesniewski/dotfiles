@@ -1,4 +1,4 @@
 # --style=changes,grid,header-filename,snip
-# --paging=never
+--paging=never
 
 --map-syntax "*.cake:C#"
