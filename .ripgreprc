@@ -10,7 +10,8 @@
 --type-add=cake:*.cake
 --type-add=dbml:*.dbml
 --type-add=xaml:*.xaml
---type-add=sln:*.sln
+--type-add=sln:*.{sln,slnx}
+--type-add=msg:*.msg
 
 --type-add=proj:*.*proj
 --type-add=proj:*.{props,targets}
