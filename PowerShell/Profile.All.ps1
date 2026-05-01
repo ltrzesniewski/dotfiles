@@ -58,6 +58,11 @@ function dbs {
     dotnet build @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
 }
 
+# dotnet test summary
+function dts {
+    dotnet test @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
+}
+
 # fd hyperlink
 function fdh {
     fd --hyperlink=auto @args
