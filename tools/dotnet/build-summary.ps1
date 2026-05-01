@@ -11,6 +11,7 @@ param(
 
 begin {
     $script:hasBuildResult = $false
+    $script:failedBuilds = @{}
     $script:hasTestResult = $false
     $script:previousProject = $null
 
@@ -44,23 +45,34 @@ process {
     $inputLine = $_
 
     if (-not $script:hasBuildResult) {
-        # Check if this line is the build success of a project
+        # Is this a project build success?
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
             $project = $matches['project']
             $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? "${dim} $($matches['tfm'])" : ''
             Write-Output "${reset}  ✅ 🔨 ${project}${tfm}${reset}"
         }
 
-        # Check if this line is the result of a test
+        # Is this a project build error?
+        if (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
+            $project = $matches['project']
+            $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.]+)' ? "${dim} $($matches['tfm'])" : ''
+            $errorKey = "${project}/${tfm}"
+            if ($errorKey -notin $script:failedBuilds.Keys) {
+                $script:failedBuilds[$errorKey] = $true
+                Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${tfm}${reset}"
+            }
+        }
+
+        # Is this a test result?
         if (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-[^-]+-\s+(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
             $script:hasTestResult = $true
             $success = $matches['result'] -eq 'Passed'
             $project = $matches['project']
             $tfm = $matches['tfm'] ? "${dim} $($matches['tfm'])" : ''
-            Write-Output "${reset}  $($success ? '✅' : "❌$brightRed") 🧪 ${project}${tfm}${reset}"
+            Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${tfm}${reset}"
         }
 
-        # Check if this line contains the build result message
+        # Is this the final build result message?
         if ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
             $script:hasBuildResult = $true
             $coloredLine = switch ($matches['result']) {
@@ -168,7 +180,7 @@ $
 }
 
 end {
-    if (-not $script:hasBuildResult -and -not $script:hasTestResult) {
+    if (-not $script:hasBuildResult -and -not $script:hasTestResult -and $script:failedBuilds.Count -eq 0) {
         Write-Output ""
         Write-Output "${brightYellow}No build or test result found in output. Please ensure this script is used with the output of a dotnet build or test command.${reset}"
         exit 1
