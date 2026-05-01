@@ -43,7 +43,9 @@ process {
     if (-not $script:hasBuildResult) {
         # Check if this line is the build success of a project
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
-            Write-Output "${reset}  ✅ $($matches['project'])"
+            $project = $matches['project']
+            $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? "${dim} $($matches['tfm'])" : ''
+            Write-Output "${reset}  ✅ ${project}${tfm}${reset}"
         }
 
         # Check if this line contains the build result message
