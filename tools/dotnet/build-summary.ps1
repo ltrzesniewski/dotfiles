@@ -1,5 +1,5 @@
 #
-# Pipeline which processes the output of a "dotnet build" command and outputs only the summary,
+# Pipeline which processes the output of a "dotnet build/test" command and outputs only the summary,
 # including hyperlinks for errors and warnings that open in VS Code.
 #
 # Helps with large refactorings.
@@ -11,10 +11,13 @@ param(
 
 begin {
     $script:hasBuildResult = $false
+    $script:hasTestResult = $false
     $script:previousProject = $null
 
     $reset = "`e[0m"
     $dim = "`e[0;2m"
+    $brightRed = "`e[0;91m"
+    $brightYellow = "`e[0;93m"
 
     function Get-Uri {
         param (
@@ -45,7 +48,16 @@ process {
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
             $project = $matches['project']
             $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? "${dim} $($matches['tfm'])" : ''
-            Write-Output "${reset}  ✅ ${project}${tfm}${reset}"
+            Write-Output "${reset}  ✅ 🔨 ${project}${tfm}${reset}"
+        }
+
+        # Check if this line is the result of a test
+        if (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-[^-]+-\s+(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
+            $script:hasTestResult = $true
+            $success = $matches['result'] -eq 'Passed'
+            $project = $matches['project']
+            $tfm = $matches['tfm'] ? "${dim} $($matches['tfm'])" : ''
+            Write-Output "${reset}  $($success ? '✅' : "❌$brightRed") 🧪 ${project}${tfm}${reset}"
         }
 
         # Check if this line contains the build result message
@@ -135,7 +147,7 @@ $
         $fileLink = "${reset}${filePath}"
         $fileLink += Get-Hyperlink (Get-Uri $fullPath $line $column) "`e[1;97m${fileName}" # Bold bright white
 
-        $typeColor = "`e[0;$($type -eq 'error' ? 91 : 93)m" # Red/Yellow
+        $typeColor = $type -eq 'error' ? $brightRed : $brightYellow
 
         $typeIcon = switch ($type) {
             'error' { '❌' }
@@ -156,9 +168,9 @@ $
 }
 
 end {
-    if (-not $script:hasBuildResult) {
+    if (-not $script:hasBuildResult -and -not $script:hasTestResult) {
         Write-Output ""
-        Write-Output "`e[0;93mNo build result found in output. Please ensure this script is used with the output of a dotnet build command.${reset}"
+        Write-Output "${brightYellow}No build or test result found in output. Please ensure this script is used with the output of a dotnet build or test command.${reset}"
         exit 1
     }
 }
