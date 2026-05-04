@@ -45,35 +45,36 @@ process {
     $inputLine = $_
 
     if (-not $script:hasBuildResult) {
-        # Is this a project build success?
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
+            # Build success
             $project = $matches['project']
-            $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? "${dim} $($matches['tfm'])" : ''
-            Write-Output "${reset}  ✅ 🔨 ${project}${tfm}${reset}"
+            $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? " $($matches['tfm'])" : ''
+            Write-Output "${reset}  ✅ 🔨 ${project}${dim}${tfm}${reset}"
         }
-
-        # Is this a project build error?
-        if (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
+        elseif (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
+            # Build error
             $project = $matches['project']
-            $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.]+)' ? "${dim} $($matches['tfm'])" : ''
+            $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.]+)' ? " $($matches['tfm'])" : ''
             $errorKey = "${project}/${tfm}"
             if ($errorKey -notin $script:failedBuilds.Keys) {
                 $script:failedBuilds[$errorKey] = $true
-                Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${tfm}${reset}"
+                Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${dim}${tfm}${reset}"
             }
         }
-
-        # Is this a test result?
-        if (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-[^-]+-\s+(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
+        elseif (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-\s*Failed:\s*(?<failed>\d+),\s*Passed:\s*(?<passed>\d+),\s*Skipped:\s*(?<skipped>\d+),\s*Total:\s*(?<total>\d+),\s*Duration:\s*(?<duration>.+?)\s*-\s*(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
+            # Test result
             $script:hasTestResult = $true
             $success = $matches['result'] -eq 'Passed'
             $project = $matches['project']
-            $tfm = $matches['tfm'] ? "${dim} $($matches['tfm'])" : ''
-            Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${tfm}${reset}"
+            $failed = $matches['failed']
+            $passed = $matches['passed']
+            $skipped = $matches['skipped']
+            $duration = $matches['duration'] -replace '(?<=\d)\s+', ''
+            $tfm = $matches['tfm'] ? " $($matches['tfm'])" : ''
+            Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - ${dim}${passed} passed$($failed -ne '0' ? ", ${failed} failed" : '')$($skipped -ne '0' ? ", ${skipped} skipped" : '') in ${duration}${reset}"
         }
-
-        # Is this the final build result message?
-        if ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
+        elseif ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
+            # Final build result
             $script:hasBuildResult = $true
             $coloredLine = switch ($matches['result']) {
                 'succeeded' { "`e[0;1;92m${inputLine}${reset}" } # Bold bright green
