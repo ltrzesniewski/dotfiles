@@ -60,6 +60,9 @@ if command -v cargo &> /dev/null; then
     startInstall ripgrep
     cargo install --locked ripgrep --features pcre2
 
+    startInstall skim
+    cargo install --locked skim
+
     startInstall vivid
     cargo install --locked vivid
 fi

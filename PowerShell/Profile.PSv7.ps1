@@ -30,8 +30,8 @@ function cdr {
 # .SYNOPSIS
 # fd find
 function fdf {
-    $global:fdf = fd --color=always @args | fzf --ansi --scheme=path --footer="$(Get-Location)" --preview="bat --color=always --style=plain {} 2> $($IsWindows ? 'NUL' : '/dev/null') || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}" -m
-    $global:fdf # Intentional shadowing
+    $global:fdf = fd --color=always @args | fzf --multi --ansi --scheme=path --footer="$(Get-Location)" --preview="bat --color=always --style=plain {} 2> $($IsWindows ? 'NUL' : '/dev/null') || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}"
+    $global:fdf
 }
 
 # .SYNOPSIS

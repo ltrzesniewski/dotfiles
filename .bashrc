@@ -39,6 +39,8 @@ export FZF_DEFAULT_OPTS='
     --color dark,hl:bright-red:underline,hl+:bright-red:underline
 '
 
+export SKIM_DEFAULT_OPTIONS='--border=rounded --layout=reverse --info=inline-right: --highlight-line --color=dark,matched:9:u,current_match:9:u'
+
 source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 

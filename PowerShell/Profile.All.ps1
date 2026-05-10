@@ -49,6 +49,8 @@ $env:FZF_DEFAULT_OPTS = @'
     --color dark,hl:bright-red:underline,hl+:bright-red:underline
 '@
 
+$env:SKIM_DEFAULT_OPTIONS = '--border=rounded --layout=reverse --info=inline-right: --highlight-line --color=dark,matched:9:u,current_match:9:u'
+
 # Custom functions
 
 # .SYNOPSIS
