@@ -55,16 +55,17 @@ $env:FZF_DEFAULT_OPTS = @'
 # Shows functions in the Profile module
 function Get-ProfileHelp {
     function Out-Help {
-        param([scriptblock]$Filter)
+        param([scriptblock]$Filter, [scriptblock]$Format = { $_.Synopsis })
         (Get-Module Profile).ExportedFunctions.Values |
         ForEach-Object { Get-Help $_ } |
         Where-Object { $_.Role -notmatch '^Internal\b' } |
         Where-Object $Filter |
-        Sort-Object { $_.Name.Contains('-') } |
-        Format-Table -Property Name, Synopsis
+        ForEach-Object { [PSCustomObject]@{ Name = $_.Name; Description = & $Format $_ } } |
+        Format-Table -Property Name, Description
     }
 
-    Out-Help { !$_.Name.Contains('-') }
+    $esc = [char]27 # Because of PS v5
+    Out-Help { !$_.Name.Contains('-') } { $_.Synopsis -replace '^(\w+)', "${esc}[0;93m`$1${esc}[0m" }
     Out-Help { $_.Name.Contains('-') }
 }
 
