@@ -1,6 +1,8 @@
 
 # Custom functions
 
+# .SYNOPSIS
+# Updates the dotfiles repo from git
 function Update-Dotfiles {
     try {
         Write-Host -ForegroundColor Yellow "UPDATING: dotfiles"
@@ -12,23 +14,28 @@ function Update-Dotfiles {
     }
 }
 
+# .SYNOPSIS
+# Reloads the Profile module
 function Update-Profile {
     Remove-Module Profile
     . "$PSScriptRoot/Profile.ps1" -Update
 }
 
-# cd root (of current git repo)
+# .SYNOPSIS
+# cd root - of current git repo
 function cdr {
     Set-Location (git rev-parse --show-toplevel || Get-Location)
 }
 
+# .SYNOPSIS
 # fd find
 function fdf {
     $global:fdf = fd --color=always @args | fzf --ansi --scheme=path --footer="$(Get-Location)" --preview="bat --color=always --style=plain {} 2> $($IsWindows ? 'NUL' : '/dev/null') || fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory {}" -m
     $global:fdf # Intentional shadowing
 }
 
-# cd find (in current git repo, if any)
+# .SYNOPSIS
+# cd find - in current git repo
 function cdf {
     [CmdletBinding(PositionalBinding = $false)]
     param (
@@ -50,7 +57,8 @@ function cdf {
     Set-Location ($selectedDir ? (Resolve-Path -Path $selectedDir -RelativeBasePath $BaseDir) : $currentDir)
 }
 
-# cdd: cdf in current directory
+# .SYNOPSIS
+# cd find - in current directory
 function cdd {
     cdf -BaseDir (Get-Location -PSProvider FileSystem).ProviderPath @args
 }

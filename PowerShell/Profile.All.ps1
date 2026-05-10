@@ -15,6 +15,8 @@ if (Get-Command atuin -ErrorAction Ignore) {
 
 # Argument completion
 
+# .ROLE
+# Internal
 function Register-LazyCompleter {
     param ([string]$CommandName, [scriptblock]$ScriptBlock)
 
@@ -49,30 +51,54 @@ $env:FZF_DEFAULT_OPTS = @'
 
 # Custom functions
 
+# .SYNOPSIS
+# Shows functions in the Profile module
+function Get-ProfileHelp {
+    function Out-Help {
+        param([scriptblock]$Filter)
+        (Get-Module Profile).ExportedFunctions.Values |
+        ForEach-Object { Get-Help $_ } |
+        Where-Object { $_.Role -notmatch '^Internal\b' } |
+        Where-Object $Filter |
+        Sort-Object { $_.Name.Contains('-') } |
+        Format-Table -Property Name, Synopsis
+    }
+
+    Out-Help { !$_.Name.Contains('-') }
+    Out-Help { $_.Name.Contains('-') }
+}
+
+# .SYNOPSIS
+# Removes .NET build outputs (bin/obj)
 function Remove-BinObj {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
 
+# .SYNOPSIS
 # dotnet build summary
 function dbs {
     dotnet build @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
 }
 
+# .SYNOPSIS
 # dotnet test summary
 function dts {
     dotnet test @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
 }
 
+# .SYNOPSIS
 # fd hyperlink
 function fdh {
     fd --hyperlink=auto @args
 }
 
+# .SYNOPSIS
 # rg raw
 function rgr {
     rg --no-heading --no-filename --no-line-number @args
 }
 
+# .SYNOPSIS
 # rg delta
 function rgd {
     rg --json @args | delta
