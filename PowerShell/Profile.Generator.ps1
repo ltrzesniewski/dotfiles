@@ -25,7 +25,7 @@ if (Get-Command vivid -ErrorAction Ignore) {
         $colorsByPattern[$item[0]] = $item[1]
     }
 
-    $context = @{ colors = $colors }
+    $colorsRef = [ref]$colors
 
     function Add-Color {
         param ([string]$ColorCode, [switch]$Bold, [string[]] $To)
@@ -45,7 +45,7 @@ if (Get-Command vivid -ErrorAction Ignore) {
 
         foreach ($ext in $To) {
             $colorsByPattern["*.$ext"] = $value
-            $context.colors += ":*.${ext}=${value}"
+            $colorsRef.Value += ":*.${ext}=${value}"
         }
     }
 
@@ -59,8 +59,6 @@ if (Get-Command vivid -ErrorAction Ignore) {
     Add-ColorAlias 'sh' 'ps1'
     Add-ColorAlias 'cs' 'cshtml', 'razor', 'xaml'
     Add-ColorAlias 'lock' 'DotSettings', 'user', 'binlog', 'vsconfig'
-
-    $colors = $context.colors
 
     Write-Output @"
 
