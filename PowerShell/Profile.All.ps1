@@ -42,6 +42,7 @@ Register-LazyCompleter 'rustup' { rustup completions powershell }
 $env:ATUIN_CONFIG_DIR = "$PSScriptRoot/../atuin"
 $env:BAT_CONFIG_DIR = "$PSScriptRoot/../bat"
 $env:RIPGREP_CONFIG_PATH = "$PSScriptRoot/../.ripgreprc"
+$env:TELEVISION_CONFIG = "$PSScriptRoot/../television"
 
 $env:FZF_DEFAULT_OPTS = @'
     --style full:rounded

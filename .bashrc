@@ -32,6 +32,7 @@ export LS_COLORS
 export BASH_COMPLETION_USER_DIR=~/dotfiles/bash
 export ATUIN_CONFIG_DIR=~/dotfiles/atuin
 export BAT_CONFIG_DIR=~/dotfiles/bat
+export TELEVISION_CONFIG=~/dotfiles/television
 
 export FZF_DEFAULT_OPTS='
     --style full:rounded

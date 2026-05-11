@@ -63,6 +63,9 @@ if command -v cargo &> /dev/null; then
     startInstall skim
     cargo install --locked skim
 
+    startInstall television
+    cargo install --locked television
+
     startInstall vivid
     cargo install --locked vivid
 fi
