@@ -1,0 +1,19 @@
+[metadata]
+name = "files"
+"description" = "Files and folders"
+requirements = ["fd", "bat"]
+
+[source]
+command = [
+    "fd --color=always",
+    "fd --color=always --hidden",
+    "fd --color=always --unrestricted"
+]
+output = "{strip_ansi}"
+ansi = true
+
+[preview]
+command = "bat --color=always --style=plain -- '{strip_ansi}'"
+
+[keybindings]
+shortcut = "f1"

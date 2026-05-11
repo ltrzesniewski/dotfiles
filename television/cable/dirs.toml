@@ -1,0 +1,19 @@
+[metadata]
+name = "dirs"
+description = "A channel to select from directories"
+requirements = ["fd"]
+
+[source]
+command = [
+    "fd --type=dir --color=always",
+    "fd --type=dir --color=always --hidden",
+    "fd --type=dir --color=always --unrestricted"
+]
+output = "{strip_ansi}"
+ansi = true
+
+[preview]
+command = "fd --max-depth=1 --unrestricted --relative-path --color=always --base-directory '{strip_ansi}'"
+
+[keybindings]
+shortcut = "f2"
