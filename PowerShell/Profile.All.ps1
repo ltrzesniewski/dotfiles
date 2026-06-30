@@ -109,20 +109,36 @@ function rgd {
 }
 
 # .SYNOPSIS
-# rg with input file list from stdin (slow)
+# rg with input file list from stdin
 function rgi {
     begin {
-        if ($args.Length -eq 0) { throw "No arguments provided." }
-        $tempFile = New-TemporaryFile
+        if ($args.Count -eq 0) { throw "No arguments provided." }
+        $rgArgs = $args
+        $files = @()
+
+        function Invoke-Ripgrep {
+            rg @rgArgs @files
+        }
     }
     process {
-        rg --heading @args $_ $tempFile.FullName
-        if ($LASTEXITCODE -eq 0) {
-            Write-Output ''
+        $files += $_
+        if ($files.Count -ge 50) {
+            Invoke-Ripgrep
+            $files = @()
         }
     }
     end {
-        $tempFile.Delete()
+        if ($files.Count -gt 0) {
+            if ($files.Count -eq 1) {
+                $tempFile = New-TemporaryFile # For --heading
+                $files += $tempFile.FullName
+                Invoke-Ripgrep
+                $tempFile.Delete()
+            }
+            else {
+                Invoke-Ripgrep
+            }
+        }
     }
 }
 
