@@ -108,6 +108,24 @@ function rgd {
     rg --json @args | delta
 }
 
+# .SYNOPSIS
+# rg with input file list from stdin (slow)
+function rgi {
+    begin {
+        if ($args.Length -eq 0) { throw "No arguments provided." }
+        $tempFile = New-TemporaryFile
+    }
+    process {
+        rg --heading @args $_ $tempFile.FullName
+        if ($LASTEXITCODE -eq 0) {
+            Write-Output ''
+        }
+    }
+    end {
+        $tempFile.Delete()
+    }
+}
+
 # Aliases
 
 Set-Alias ll Get-ChildItem
