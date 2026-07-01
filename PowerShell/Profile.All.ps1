@@ -115,6 +115,7 @@ function rgi {
         if ($args.Count -eq 0) { throw "No arguments provided." }
         $rgArgs = $args
         $files = @()
+        $filesLength = 0;
 
         function Invoke-Ripgrep {
             rg @rgArgs @files
@@ -122,9 +123,12 @@ function rgi {
     }
     process {
         $files += $_
-        if ($files.Count -ge 50) {
+        $filesLength += $_.Length
+
+        if ($filesLength -gt 30000) {
             Invoke-Ripgrep
             $files = @()
+            $filesLength = 0
         }
     }
     end {
