@@ -48,10 +48,10 @@ process {
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
             # Build success
             $project = $matches['project']
-            $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.]+)[/\\]' ? " $($matches['tfm'])" : ''
+            $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.-]+)[/\\]' ? " $($matches['tfm'])" : ''
             Write-Output "${reset}  ✅ 🔨 ${project}${dim}${tfm}${reset}"
         }
-        elseif (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
+        elseif (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)(_[a-z0-9]{8}_wpftmp)?\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
             # Build error
             $project = $matches['project']
             $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.]+)' ? " $($matches['tfm'])" : ''
@@ -136,16 +136,16 @@ $
 
             if ($project -match @'
 (?x) ^
-(?<projectFullPath>
+(?:
     (?<projectPath> .+? [\\/] )
     (?<projectName> [^\\/:]+? )
 )
 (?<projectDetails> :: .+? )?
 $
 '@) {
-                $projectFullPath = $matches['projectFullPath']
                 $projectPath = $matches['projectPath']
-                $projectName = $matches['projectName']
+                $projectName = $matches['projectName'] -replace '_[a-z0-9]{8}_wpftmp(?<extension>\.[a-z]*proj)$', '${extension}'
+                $projectFullPath = "${projectPath}${projectName}"
                 $projectDetails = $matches['projectDetails']
 
                 $projectHeader += Get-Hyperlink (Get-Uri $projectFullPath) "${projectPath}`e[1;96m${projectName}" # Bold bright cyan
