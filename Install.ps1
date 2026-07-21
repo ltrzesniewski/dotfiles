@@ -32,7 +32,7 @@ Function Install-WinGet {
 
 Function Install-ProfileModule {
     param ([string]$ModuleName)
-    Install-App $ModuleName { Update-Module $ModuleName || Install-Module $ModuleName -Scope CurrentUser -Force }
+    Install-App $ModuleName { Update-Module $ModuleName -ErrorAction SilentlyContinue || Install-Module $ModuleName -Scope CurrentUser -Force }
 }
 
 # Add profile script and other one-time stuff
@@ -43,6 +43,7 @@ Function Install-ProfileModule {
     }
 
     $origContent = Get-Content -LiteralPath $PROFILE -Raw -Encoding UTF8
+    if ($null -eq $origContent) { $origContent = "" }
     $content = $origContent.Replace('. ~/dotfiles/Microsoft.PowerShell_profile.ps1', '. ~/dotfiles/PowerShell/Profile.ps1')
     if (-not $content.Contains('. ~/dotfiles/PowerShell/Profile.ps1')) {
         $content = @"
