@@ -1,5 +1,6 @@
 [core]
 	longpaths = true
+	symlinks = true
 	editor = \"C:/Program Files/GitExtensions/GitExtensions.exe\" fileeditor
 
 [credential]

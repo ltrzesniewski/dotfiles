@@ -49,6 +49,7 @@
 	required = true
 
 [delta]
+	paging = never
 	navigate = true
 	side-by-side = true
 	hyperlinks = true
