@@ -14,3 +14,13 @@ Important = "#FED8B1"
 # Title = ""
 # Base = ""
 # Muted = ""
+
+# Colors from the Ottosson Windows Terminal theme
+SyntaxCommand = "#FFC944"
+SyntaxFlag = "#808080"
+SyntaxString = "#00A7B2"
+SyntaxVariable = "#58EA51"
+
+# These are different from the theme
+SyntaxOperator = "#808080"
+SyntaxComment = "#808080"
