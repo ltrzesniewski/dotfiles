@@ -15,12 +15,18 @@ Important = "#FED8B1"
 # Base = ""
 # Muted = ""
 
-# Colors from the Ottosson Windows Terminal theme
-SyntaxCommand = "#FFC944"
-SyntaxFlag = "#808080"
-SyntaxString = "#00A7B2"
-SyntaxVariable = "#58EA51"
+# Default PSReadLine colors
+SyntaxCommand = "@yellow"
+SyntaxFlag = "@dark_grey"
+SyntaxString = "@dark_cyan"
+SyntaxVariable = "@green"
+SyntaxOperator = "@dark_grey"
+SyntaxComment = "@dark_green"
 
-# These are different from the theme
-SyntaxOperator = "#808080"
-SyntaxComment = "#808080"
+# Colors from the Ottosson Windows Terminal theme
+# SyntaxCommand = "#FFC944"
+# SyntaxFlag = "#808080"
+# SyntaxString = "#00A7B2"
+# SyntaxVariable = "#58EA51"
+# SyntaxOperator = "#808080"
+# SyntaxComment = "#3FAE3A"
