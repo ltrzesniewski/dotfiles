@@ -45,7 +45,7 @@ export SKIM_DEFAULT_OPTIONS='--border=rounded --layout=reverse --info=inline-rig
 source ~/dotfiles/bash/.bash-preexec.sh
 command -v atuin &> /dev/null && source <(atuin init bash)
 
-rm_binobj() {
+rmbo() {
     find -type d \( -name bin -o -name obj \) -prune -exec rm -r {} +
 }
 

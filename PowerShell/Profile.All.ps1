@@ -73,8 +73,8 @@ function Get-ProfileHelp {
 }
 
 # .SYNOPSIS
-# Removes .NET build outputs (bin/obj)
-function Remove-BinObj {
+# rm bin obj
+function rmbo {
     Get-ChildItem -Include @('bin', 'obj') -Directory -Recurse | Remove-Item -Recurse
 }
 
