@@ -46,7 +46,7 @@ command -v rustup &> /dev/null && rustup update
 
 if command -v cargo &> /dev/null; then
     startInstall atuin
-    cargo install --locked atuin --git https://github.com/atuinsh/atuin.git
+    cargo install --locked atuin
 
     startInstall bat
     cargo install --locked bat
@@ -59,12 +59,6 @@ if command -v cargo &> /dev/null; then
 
     startInstall ripgrep
     cargo install --locked ripgrep --features pcre2
-
-    startInstall skim
-    cargo install --locked skim
-
-    startInstall television
-    cargo install --locked television
 
     startInstall vivid
     cargo install --locked vivid
