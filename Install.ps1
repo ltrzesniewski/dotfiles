@@ -1,3 +1,4 @@
+param([string[]]$Skip)
 
 Function Write-Header {
     param ([string]$Text)
@@ -12,6 +13,11 @@ Function Install-App {
         [scriptblock]$ScriptBlock,
         [int[]]$ValidExitCodes = @()
     )
+
+    if ($Skip -contains $AppName) {
+        Write-Header "SKIPPED: $AppName"
+        return
+    }
 
     Write-Header "INSTALLING: $AppName"
     & @ScriptBlock
@@ -87,7 +93,7 @@ if (Get-Command "dotnet" -ErrorAction SilentlyContinue) {
 # Install Rust apps
 
 if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
-    Install-App "rust update" { rustup update }
+    Install-App "rust" { rustup update }
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
