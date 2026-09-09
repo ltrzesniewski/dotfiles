@@ -83,6 +83,7 @@ Install-WinGet "OhMyPosh" "JanDeDobbeleer.OhMyPosh"
 Install-WinGet "Git" "Git.Git"
 Install-WinGet "fzf" "fzf"
 Install-WinGet "jq" "jqlang.jq"
+Install-WinGet "komac" "komac"
 
 # Install dotnet tools
 
