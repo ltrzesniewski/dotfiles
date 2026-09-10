@@ -80,13 +80,13 @@ function rmbo {
 
 # .SYNOPSIS
 # dotnet build summary
-function dbs {
+function db {
     dotnet build @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
 }
 
 # .SYNOPSIS
 # dotnet test summary
-function dts {
+function dt {
     dotnet test @args | & "$PSScriptRoot/../tools/dotnet/build-summary.ps1"
 }
 
