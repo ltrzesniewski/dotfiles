@@ -19,9 +19,9 @@
 	ck = "!f() { git fetch origin && git checkout -B $1 origin/$1; }; f"
 	sw = switch
 	st = !git status "$@" && echo '\n\nLast commit:\n' && git log -1 --format=short
-	ll = log -50
-	lb = log --first-parent --ignore-missing HEAD ^origin/master ^origin/main ^upstream/master ^upstream/main
-	lg = log --graph --all -50
+	ll = log --date=format-local:'%Y-%m-%d %H:%M' -50
+	lb = log --date=format-local:'%Y-%m-%d %H:%M' --first-parent --ignore-missing HEAD ^origin/master ^origin/main ^upstream/master ^upstream/main
+	lg = log --date=format-local:'%Y-%m-%d %H:%M' --graph --all -50
 	pr = pull --rebase
 	cm = commit --all --message
 	dh = diff HEAD
@@ -33,7 +33,7 @@
 	pretty = simple
 
 [pretty]
-	simple = "%C(#6F4E37)%h  %C(#A67B5B)%as  %<(20,trunc)%C(#ECB176)%an%C(reset)  %<(60,trunc)%s %C(#FED8B1)%d"
+	simple = "%C(#6F4E37)%h  %C(#A67B5B)%ad  %<(20,trunc)%C(#ECB176)%an%C(reset)  %<(80,trunc)%s %C(#FED8B1)%d"
 	mylog = "%C(#6F4E37)%h  %C(#A67B5B)%ad%C(reset)  %s"
 
 [interactive]
