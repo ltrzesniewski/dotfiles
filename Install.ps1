@@ -98,7 +98,19 @@ if (Get-Command "rustup" -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command "cargo" -ErrorAction SilentlyContinue) {
-    Install-App "atuin" { cargo install --locked atuin }
+    Install-App "atuin" {
+        if (Get-Command "atuin" -ErrorAction SilentlyContinue) {
+            atuin config set daemon.enabled false
+            atuin config set daemon.autostart false
+            atuin config set search_mode fuzzy
+            atuin daemon stop
+        }
+        cargo install --locked atuin
+        if (Get-Command "atuin" -ErrorAction SilentlyContinue) {
+            atuin config enable daemon
+        }
+    }
+
     Install-App "bat" { cargo install --locked bat }
     Install-App "delta" { cargo install --locked git-delta }
     Install-App "fd" { cargo install --locked fd-find }
