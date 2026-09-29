@@ -44,6 +44,7 @@
 ## which search mode to use for interactive search
 ## possible values: prefix, fulltext, fuzzy, daemon-fuzzy
 # search_mode = "fuzzy"
+search_mode = "daemon-fuzzy"
 
 ## which search mode to use when atuin is invoked from a shell up-key binding
 ## the accepted values are identical to those of "search_mode"
@@ -59,6 +60,7 @@
 ## the accepted values are identical to those of "filter_mode"
 ## leave unspecified to use same mode set in "filter_mode"
 # filter_mode_shell_up_key_binding = "global"
+filter_mode_shell_up_key_binding = "session"
 
 ## With workspace filtering enabled, Atuin will filter for commands executed
 ## in any directory within a git repository tree (default: false).
@@ -80,6 +82,7 @@
 ## when atuin is invoked from a shell up-key binding
 ## the accepted values are identical to those of "inline_height"
 # inline_height_shell_up_key_binding = 0
+inline_height_shell_up_key_binding = 10
 
 ## Invert the UI - put the search bar at the top , Default to `false`
 # invert = false
@@ -108,6 +111,7 @@
 ## Show numeric shortcuts (1..9) beside list items in the TUI
 ## set to false to hide the moving numbers if you find them distracting
 # show_numeric_shortcuts = true
+show_numeric_shortcuts = false
 
 ## default history list format - can also be specified with the --format arg
 # history_format = "{time}\t{command}\t{duration}"
@@ -145,6 +149,7 @@
 ## version (and whether an update is available), a keymap hint, and the total
 ## amount of commands in your history.
 # show_help = true
+show_help = false
 
 ## Configure whether or not to show tabs for search and inspect
 # show_tabs = true
@@ -155,6 +160,7 @@
 ## of keyboard shortcuts to switch tab. 0 to never auto-hide, default is 8 (lines).
 ## This is ignored except in `compact` mode.
 # auto_hide_height = 8
+auto_hide_height = 20
 
 ## Defaults to true. This matches history against a set of default regex, and will not save it if we get a match. Defaults include
 ## 1. AWS key id
@@ -172,6 +178,7 @@ enter_accept = true
 
 ## Defaults to false. If enabled, when triggered after &&, || or |, Atuin will complete commands to chain rather than replace the current line.
 # command_chaining = false
+command_chaining = true
 
 ## This specifies the keymap on the startup of `atuin search`. If this is set
 ## to "auto", the startup keymap mode in the Atuin search is automatically
@@ -257,6 +264,40 @@ enter_accept = true
 # Defaults to false. The backspace key performs the same functionality as Tab and copies the selected line to the command line to be modified when at the start of the line.
 # accept_with_backspace = false
 
+[keymap.emacs]
+"left" = "cursor-left"
+
+"right" = [
+    { when = "cursor-at-end", action = "return-selection" },
+    { action = "cursor-right" }
+]
+
+"tab" = "return-selection"
+"enter" = "accept"
+
+"ctrl-q" = "return-query"
+"ctrl-C" = "copy"
+
+"ctrl-i" = "toggle-tab"
+"ctrl-l" = "clear-line"
+
+"ctrl-s" = "cycle-search-mode"
+"ctrl-f" = "cycle-filter-mode"
+
+"ctrl-shift-delete" = "delete"
+
+"ctrl-home" = "scroll-to-top"
+"ctrl-end" = "scroll-to-bottom"
+
+"ctrl-b" = "switch-context"
+"ctrl-n" = [
+    { when = "!has-context", action = "switch-context" },
+    { action = "clear-context" }
+]
+
+[keymap.inspector]
+ctrl-i = "toggle-tab"
+
 [preview]
 ## which preview strategy to use to calculate the preview height (respects max_preview_height).
 ## possible values: auto, static
@@ -268,10 +309,12 @@ enter_accept = true
 [daemon]
 ## Enables using the daemon to sync.
 # enabled = false
+enabled = true
 
 ## Automatically start and manage the daemon when needed.
 ## Not compatible with `systemd_socket = true`.
 # autostart = false
+autostart = true
 
 ## How often the daemon should sync in seconds
 # sync_frequency = 300
@@ -306,7 +349,7 @@ enter_accept = true
 ## starts once.
 # enabled = false
 
-# [theme]
+[theme]
 ## Color theme to use for rendering in the terminal.
 ## There are some built-in themes, including the base theme ("default"),
 ## "autumn" and "marine". You can add your own themes to the "./themes" subdirectory of your
@@ -317,6 +360,7 @@ enter_accept = true
 ## If you provide a custom theme file, it should be  called "NAME.toml" and the theme below
 ## should be the stem, i.e. `theme = "NAME"` for your chosen NAME.
 # name = "autumn"
+name = "coffee"
 
 ## Whether the theme manager should output normal or extra information to help fix themes.
 ## Boolean, true or false. If unset, left up to the theme manager.
@@ -327,6 +371,7 @@ enter_accept = true
 ## The "workspace" mode is skipped when not in a workspace or workspaces = false.
 ## Default filter mode can be overridden with the filter_mode setting.
 # filters = ["global", "host", "session", "workspace", "directory", "session-preload"]
+filters = ["global", "session", "workspace", "directory"]
 
 ## Filter interactive search results by the shell used to run the command:
 ##
@@ -395,6 +440,7 @@ enter_accept = true
 ##
 ## Make directory expand instead of command:
 # columns = ["duration", "time", { type = "directory", expand = true }, { type = "command", expand = false }]
+columns = ["duration", "time", "directory", "command"]
 
 ## Syntax highlight commands in the search results, using the theme's colors.
 ## Not available on all platforms (e.g. Windows).
