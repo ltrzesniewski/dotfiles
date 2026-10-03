@@ -1,4 +1,10 @@
 
+# Shell tools
+
+if (Get-Command atuin -ErrorAction Ignore) {
+    atuin daemon start &
+}
+
 # Custom functions
 
 # .SYNOPSIS
