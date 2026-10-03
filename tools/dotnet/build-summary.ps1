@@ -10,7 +10,7 @@ param(
 )
 
 begin {
-    $script:hasBuildResult = $false
+    $script:hasFinalResult = $false
     $script:failedBuilds = @{}
     $script:hasTestResult = $false
     $script:previousProject = $null
@@ -19,6 +19,8 @@ begin {
     $dim = "`e[0;2m"
     $brightRed = "`e[0;91m"
     $brightYellow = "`e[0;93m"
+    $boldBrightGreen = "`e[0;1;92m"
+    $boldBrightRed = "`e[0;1;91m"
 
     function Get-Uri {
         param (
@@ -44,7 +46,7 @@ begin {
 process {
     $inputLine = $_
 
-    if (-not $script:hasBuildResult) {
+    if (-not $script:hasFinalResult) {
         if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
             # Build success
             $project = $matches['project']
@@ -61,8 +63,18 @@ process {
                 Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${dim}${tfm}${reset}"
             }
         }
+        elseif (!$Short -and $inputLine -match '[/\\](?<project>[^/\\]*?)\.(?:dll|exe) \((?<tfm>net[\w.]+)\|\w+\) (?<result>passed|failed with (?<failed>\d+) error\(s\)) \((?<duration>.*)\)$') {
+            # Microsoft.Testing.Platform result
+            $script:hasTestResult = $true
+            $success = $matches['result'] -eq 'passed'
+            $project = $matches['project']
+            $failed = $matches['failed']
+            $duration = $matches['duration'] -replace ' \d+ms\b', ''
+            $tfm = $matches['tfm'] ? " $($matches['tfm'])" : ''
+            Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - $($success ? 'passed' : "${failed} failed") in ${duration}${reset}"
+        }
         elseif (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-\s*Failed:\s*(?<failed>\d+),\s*Passed:\s*(?<passed>\d+),\s*Skipped:\s*(?<skipped>\d+),\s*Total:\s*(?<total>\d+),\s*Duration:\s*(?<duration>.+?)\s*-\s*(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
-            # Test result
+            # VSTest result
             $script:hasTestResult = $true
             $success = $matches['result'] -eq 'Passed'
             $project = $matches['project']
@@ -75,15 +87,30 @@ process {
         }
         elseif ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
             # Final build result
-            $script:hasBuildResult = $true
+            $script:hasFinalResult = $true
             $coloredLine = switch ($matches['result']) {
-                'succeeded' { "`e[0;1;92m${inputLine}${reset}" } # Bold bright green
-                'FAILED' { "`e[0;1;91m${inputLine}${reset}" } # Bold bright red
+                'succeeded' { "${boldBrightGreen}${inputLine}${reset}" }
+                'FAILED' { "${boldBrightRed}${inputLine}${reset}" }
                 default { $inputLine }
             }
 
             Write-Output ""
             Write-Output $coloredLine
+            Write-Progress -Completed
+            return
+        }
+        elseif ($inputLine -match '^Test run summary: (?<result>Passed|Failed)!') {
+            # Final MTF summary
+            $script:hasFinalResult = $true
+            $coloredLine = switch ($matches['result']) {
+                'Passed' { "${boldBrightGreen}${inputLine}${reset}" }
+                'Failed' { "${boldBrightRed}${inputLine}${reset}" }
+                default { $inputLine }
+            }
+
+            Write-Output ""
+            Write-Output $coloredLine
+            Write-Output ""
             Write-Progress -Completed
             return
         }
@@ -183,7 +210,7 @@ $
 }
 
 end {
-    if (-not $script:hasBuildResult -and -not $script:hasTestResult -and $script:failedBuilds.Count -eq 0) {
+    if (-not $script:hasFinalResult -and -not $script:hasTestResult -and $script:failedBuilds.Count -eq 0) {
         Write-Output ""
         Write-Output "${brightYellow}No build or test result found in output. Please ensure this script is used with the output of a dotnet build or test command.${reset}"
         exit 1
