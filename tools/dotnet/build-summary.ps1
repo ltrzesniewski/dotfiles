@@ -13,7 +13,7 @@ begin {
     enum Phase {
         Execution
         BuildSummary
-        TestSummary
+        MtpTestSummary
     }
 
     $script:currentPhase = [Phase]::Execution
@@ -37,7 +37,8 @@ begin {
             [int]$line,
             [int]$column
         )
-        $uri = "vscode://file/$($fullPath.Replace('\', '/'))"
+        $uri = "vscode://file/"
+        $uri += [Uri]::EscapeDataString($fullPath.Replace('\', '/')).Replace('%2F', '/')
         $uri += $line ? ":$line" : ""
         $uri += $line -and $column ? ":$column" : ""
         $uri
@@ -57,23 +58,27 @@ process {
 
     switch ($script:currentPhase) {
         ([Phase]::Execution) {
-            if (!$Short -and $inputLine -match '^  (?<project>[\w-.]+) -> ') {
+            if ($inputLine -match '^  (?<project>[\w-.]+) -> ') {
                 # Build success
                 $project = $matches['project']
                 $tfm = $inputLine -match '-> .*[/\\](?:Debug|Release)[/\\](?<tfm>net[\w.-]+)[/\\]' ? " $($matches['tfm'])" : ''
-                Write-Output "${reset}  ✅ 🔨 ${project}${dim}${tfm}${reset}"
+                if (!$Short) {
+                    Write-Output "${reset}  ✅ 🔨 ${project}${dim}${tfm}${reset}"
+                }
             }
-            elseif (!$Short -and $inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)(_[a-z0-9]{8}_wpftmp)?\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
+            elseif ($inputLine -match ' error \w+:.* \[.*?[/\\](?<project>[^/\\]+?)(_[a-z0-9]{8}_wpftmp)?\.(?:\w*proj)(?<projectDetails>::[^\]]*)?\]$') {
                 # Build error
                 $project = $matches['project']
-                $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.]+)' ? " $($matches['tfm'])" : ''
+                $tfm = $matches['projectDetails'] -match '\bTargetFramework=(?<tfm>net[\w.-]+)' ? " $($matches['tfm'])" : ''
                 $errorKey = "${project}/${tfm}"
                 if ($errorKey -notin $script:failedBuilds.Keys) {
                     $script:failedBuilds[$errorKey] = $true
-                    Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${dim}${tfm}${reset}"
+                    if (!$Short) {
+                        Write-Output "${reset}  ❌ 🔨 ${brightRed}${project}${dim}${tfm}${reset}"
+                    }
                 }
             }
-            elseif (!$Short -and $inputLine -match '[/\\](?<project>[^/\\]*?)\.(?:dll|exe) \((?<tfm>net[\w.]+)\|\w+\) (?<result>passed|failed with (?<failed>\d+) error\(s\)) \((?<duration>.*)\)$') {
+            elseif ($inputLine -match '[/\\](?<project>[^/\\]*?)\.(?:dll|exe) \((?<tfm>net[\w.-]+)\|\w+\) (?<result>passed|failed with (?<failed>\d+) error[()s]*) \((?<duration>.*)\)$') {
                 # Microsoft.Testing.Platform result
                 $script:hasTestResult = $true
                 $success = $matches['result'] -eq 'passed'
@@ -81,9 +86,11 @@ process {
                 $failed = $matches['failed']
                 $duration = $matches['duration'] -replace ' \d+ms\b', ''
                 $tfm = $matches['tfm'] ? " $($matches['tfm'])" : ''
-                Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - $($success ? 'passed' : "${failed} failed") in ${duration}${reset}"
+                if (!$Short) {
+                    Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - $($success ? 'passed' : "${failed} failed") in ${duration}${reset}"
+                }
             }
-            elseif (!$Short -and $inputLine -match '^(?<result>Passed|Failed)!\s*-\s*Failed:\s*(?<failed>\d+),\s*Passed:\s*(?<passed>\d+),\s*Skipped:\s*(?<skipped>\d+),\s*Total:\s*(?<total>\d+),\s*Duration:\s*(?<duration>.+?)\s*-\s*(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.]+)\))?') {
+            elseif ($inputLine -match '^(?<result>Passed|Failed)!\s*-\s*Failed:\s*(?<failed>\d+),\s*Passed:\s*(?<passed>\d+),\s*Skipped:\s*(?<skipped>\d+),\s*Total:\s*(?<total>\d+),\s*Duration:\s*(?<duration>.+?)\s*-\s*(?<project>.*?)\.(?:dll|exe)(?:\s+\((?<tfm>net[\w.-]+)\))?') {
                 # VSTest result
                 $script:hasTestResult = $true
                 $success = $matches['result'] -eq 'Passed'
@@ -93,7 +100,9 @@ process {
                 $skipped = $matches['skipped']
                 $duration = $matches['duration'] -replace '(?<=\d)\s+', ''
                 $tfm = $matches['tfm'] ? " $($matches['tfm'])" : ''
-                Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - ${dim}${passed} passed$($failed -ne '0' ? ", ${failed} failed" : '')$($skipped -ne '0' ? ", ${skipped} skipped" : '') in ${duration}${reset}"
+                if (!$Short) {
+                    Write-Output "${reset}  $($success ? '✅' : "❌${brightRed}") 🧪 ${project}${dim}${tfm} - ${dim}${passed} passed$($failed -ne '0' ? ", ${failed} failed" : '')$($skipped -ne '0' ? ", ${skipped} skipped" : '') in ${duration}${reset}"
+                }
             }
             elseif ($inputLine -match '^Build (?<result>succeeded|FAILED)\.') {
                 # Final build result
@@ -111,7 +120,7 @@ process {
             }
             elseif ($inputLine -match '^Test run summary: (?<result>Passed|Failed)!') {
                 # Final MTF summary
-                $script:currentPhase = [Phase]::TestSummary
+                $script:currentPhase = [Phase]::MtpTestSummary
                 $coloredLine = switch ($matches['result']) {
                     'Passed' { $script:mtpResult = $true; "${boldBrightGreen}${inputLine}${reset}" }
                     'Failed' { $script:mtpResult = $false; "${boldBrightRed}${inputLine}${reset}" }
@@ -220,7 +229,7 @@ $
             }
         }
 
-        ([Phase]::TestSummary) {
+        ([Phase]::MtpTestSummary) {
             if ($mtpResult -eq $true -and $inputLine -match '^  succeeded: \d+$') {
                 Write-Output "${green}${inputLine}${reset}"
             }
@@ -244,6 +253,8 @@ $
 }
 
 end {
+    Write-Progress -Completed
+
     if ($script:currentPhase -eq [Phase]::Execution -and -not $script:hasTestResult -and $script:failedBuilds.Count -eq 0) {
         Write-Output ""
         Write-Output "${brightYellow}No build or test result found in output. Please ensure this script is used with the output of a dotnet build or test command.${reset}"
