@@ -236,6 +236,17 @@ $
             elseif ($mtpResult -eq $false -and $inputLine -match '^  failed: \d+$') {
                 Write-Output "${red}${inputLine}${reset}"
             }
+            elseif ($inputLine -match '^  (?<path>(?>[^/\\]*[/\\])*?)(?<project>[^/\\]+?)(?<ext>\.dll|\.exe) (?<config>\(.*?\)) (?<result>passed|failed with \d+ error[()s]*) (?<time>\(.*?\))$') {
+                $path = $matches['path']
+                $project = $matches['project']
+                $ext = $matches['ext']
+                $config = $matches['config']
+                $result = $matches['result']
+                $time = $matches['time']
+                $resultHighlight = $result -eq 'passed' ? $green : $red
+
+                Write-Output "  ${dim}${path}${reset}${project}${dim}${ext} ${config} ${resultHighlight}${result} ${dim}${time}${reset}"
+            }
             elseif ($inputLine -match '^Test run completed with non-success exit code') {
                 Write-Output ""
                 Write-Output "${dim}${inputLine}${reset}"
